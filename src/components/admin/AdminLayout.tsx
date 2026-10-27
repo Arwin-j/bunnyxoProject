@@ -10,7 +10,7 @@ interface AdminLayoutProps {
 }
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const { events } = useEvents();
 
   // Add <meta name="robots" content="noindex">
@@ -33,6 +33,23 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       }
     };
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="flex flex-col items-center gap-3">
+          <img
+            src="/bunny-logo.webp"
+            alt="Loading"
+            className="bob size-14 object-contain select-none"
+          />
+          <p className="font-mono text-sm text-muted-foreground animate-pulse">
+            Checking admin credentials… 🐾
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" replace />;

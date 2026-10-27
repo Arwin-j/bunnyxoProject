@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 export const AdminLoginPage: React.FC = () => {
-  const { signIn, isAuthenticated, isSupabase } = useAuth();
+  const { signIn, isAuthenticated, isSupabase, loading } = useAuth();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState('');
@@ -13,13 +13,18 @@ export const AdminLoginPage: React.FC = () => {
 
   // If already logged in, redirect straight to admin overview
   React.useEffect(() => {
-    if (isAuthenticated) {
+    if (!loading && isAuthenticated) {
       navigate('/admin', { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username.trim() || !password) {
+      setError('Please enter both username/email and password.');
+      return;
+    }
+
     setError('');
     setIsSubmitting(true);
 
@@ -68,18 +73,18 @@ export const AdminLoginPage: React.FC = () => {
               htmlFor="username"
               className="block text-sm font-semibold font-mono text-foreground"
             >
-              {isSupabase ? 'admin.email' : 'auth.username'}
+              Username or Email
             </label>
             <input
               id="username"
               name="username"
-              type={isSupabase ? 'email' : 'text'}
-              autoComplete={isSupabase ? 'email' : 'username'}
+              type="text"
+              autoComplete="username email"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="mt-1 w-full rounded-2xl border-[3px] border-foreground bg-background px-4 py-2 text-base font-mono focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder={isSupabase ? 'admin@heartopia.com' : 'bunnyAdmin'}
+              placeholder="bunnyAdmin or admin@heartopia.com"
               aria-invalid={!!error}
               aria-describedby={error ? 'login-error' : undefined}
             />
@@ -90,7 +95,7 @@ export const AdminLoginPage: React.FC = () => {
               htmlFor="password"
               className="block text-sm font-semibold font-mono text-foreground"
             >
-              {isSupabase ? 'admin.password' : 'auth.password'}
+              Password
             </label>
             <input
               id="password"
@@ -127,13 +132,12 @@ export const AdminLoginPage: React.FC = () => {
         )}
 
         <div className="mt-6 border-t border-dashed border-foreground/30 pt-4 text-center">
-          {isSupabase ? (
-            <p className="text-xs font-mono text-muted-foreground">
-              Connected to <strong>Supabase Auth</strong>. Use your Supabase admin user credentials.
-            </p>
-          ) : (
-            <p className="text-xs font-mono text-muted-foreground">
-              Local Dev Mode: <code className="bg-muted px-1.5 py-0.5 rounded">bunnyAdmin</code> / <code className="bg-muted px-1.5 py-0.5 rounded">bunny</code>
+          <p className="text-xs font-mono text-muted-foreground">
+            Dev access: <code className="bg-muted px-1.5 py-0.5 rounded font-bold">bunnyAdmin</code> / <code className="bg-muted px-1.5 py-0.5 rounded font-bold">bunny</code>
+          </p>
+          {isSupabase && (
+            <p className="mt-1 text-[11px] font-mono text-muted-foreground/80">
+              Supabase Auth is enabled for registered admin accounts.
             </p>
           )}
         </div>

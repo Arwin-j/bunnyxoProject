@@ -13,6 +13,7 @@ import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 import { AdminOverviewPage } from './pages/admin/AdminOverviewPage';
 import { AdminEditPage } from './pages/admin/AdminEditPage';
 import { AdminEditCodesPage } from './pages/admin/AdminEditCodesPage';
+import { AuthProvider } from './hooks/useAuth';
 const PublicLayout: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-foreground">
@@ -24,7 +25,8 @@ const PublicLayout: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <Routes>
+    <AuthProvider>
+      <Routes>
       {/* Welcome Screen */}
       <Route path="/" element={<WelcomePage />} />
 
@@ -81,6 +83,7 @@ export const App: React.FC = () => {
       {/* Catch-all Fallback */}
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
+  </AuthProvider>
   );
 };
 
