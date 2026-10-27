@@ -33,6 +33,20 @@ export class SupabaseEventsRepository implements EventsRepository {
         return localList;
       }
 
+      // Check if Supabase returned any ongoing or upcoming events
+      const now = Date.now();
+      const hasActiveOrUpcoming = data.some((e) => new Date(e.ends_at).getTime() > now);
+
+      if (!hasActiveOrUpcoming) {
+        // Supabase only contains past/expired events; provide fresh local sample events
+        // so the home and events calendar are never empty
+        const localList = await this.fallbackRepo.list(filter);
+        // Combine any unique custom events with fresh active sample events
+        const localIds = new Set(localList.map((e) => e.id));
+        const customPastEvents = data.filter((e) => !localIds.has(e.id));
+        return [...localList, ...customPastEvents] as HeartopiaEvent[];
+      }
+
       return data as HeartopiaEvent[];
     } catch (err) {
       console.warn('SupabaseEventsRepository.list network exception, falling back:', err);
