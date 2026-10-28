@@ -223,7 +223,7 @@ export const AdminEditCodesPage: React.FC = () => {
           )}
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Title Input */}
             <div>
@@ -236,6 +236,12 @@ export const AdminEditCodesPage: React.FC = () => {
               <input
                 id="code-title-input"
                 type="text"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-form-type="other"
                 required
                 maxLength={80}
                 value={form.title}
@@ -256,6 +262,12 @@ export const AdminEditCodesPage: React.FC = () => {
               <input
                 id="code-code-input"
                 type="text"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-form-type="other"
                 required
                 maxLength={40}
                 value={form.code}
@@ -303,6 +315,11 @@ export const AdminEditCodesPage: React.FC = () => {
                       ref={dateInputRef}
                       id="code-expiry-date-input"
                       type="date"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      data-lpignore="true"
+                      data-form-type="other"
                       required={!isPermanent}
                       value={parseExpiryToDateInput(form.expiry)}
                       onChange={handleDateChange}
@@ -376,6 +393,12 @@ export const AdminEditCodesPage: React.FC = () => {
             <input
               id="code-rewards-input"
               type="text"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              data-lpignore="true"
+              data-form-type="other"
               maxLength={120}
               value={form.rewards}
               onChange={(e) => setForm({ ...form, rewards: e.target.value })}

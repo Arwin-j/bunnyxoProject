@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { TEMP_ADMIN_CREDENTIALS, ADMIN_SESSION_STORAGE_KEY } from '../config/tempAdmin';
 import type { User } from '@supabase/supabase-js';
 
 export interface SignInResult {
@@ -13,7 +12,7 @@ export interface AuthContextType {
   isSupabase: boolean;
   currentUser: User | null;
   loading: boolean;
-  signIn: (userOrEmail: string, pass: string) => Promise<SignInResult>;
+  signIn: (email: string, pass: string) => Promise<SignInResult>;
   signOut: () => Promise<void>;
 }
 
@@ -21,13 +20,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isSupabase = isSupabaseConfigured();
-
-  // Initialize synchronously from sessionStorage for immediate rendering
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return sessionStorage.getItem(ADMIN_SESSION_STORAGE_KEY) === 'true';
-  });
-
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -35,42 +27,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let mounted = true;
 
     if (isSupabase) {
-      // 1. Check existing Supabase session
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (!mounted) return;
-        if (session) {
-          sessionStorage.setItem(ADMIN_SESSION_STORAGE_KEY, 'true');
-          setIsAuthenticated(true);
-          setCurrentUser(session.user);
-        } else {
-          // If Supabase session is not found, check if authenticated via dev credentials
-          const localAuth = sessionStorage.getItem(ADMIN_SESSION_STORAGE_KEY) === 'true';
-          setIsAuthenticated(localAuth);
+      // 1. Verify existing cryptographic Supabase session
+      supabase.auth
+        .getSession()
+        .then(({ data: { session } }) => {
+          if (!mounted) return;
+          setCurrentUser(session?.user || null);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error('Error fetching Supabase auth session:', err);
+          if (!mounted) return;
           setCurrentUser(null);
-        }
-        setLoading(false);
-      }).catch((err) => {
-        console.error('Error fetching Supabase auth session:', err);
-        if (!mounted) return;
-        const localAuth = sessionStorage.getItem(ADMIN_SESSION_STORAGE_KEY) === 'true';
-        setIsAuthenticated(localAuth);
-        setLoading(false);
-      });
+          setLoading(false);
+        });
 
-      // 2. Listen to Supabase auth state changes
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // 2. Listen to cryptographic Supabase auth state changes
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
         if (!mounted) return;
-        if (session) {
-          sessionStorage.setItem(ADMIN_SESSION_STORAGE_KEY, 'true');
-          setIsAuthenticated(true);
-          setCurrentUser(session.user);
-          setLoading(false);
-        } else if (event === 'SIGNED_OUT') {
-          sessionStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
-          setIsAuthenticated(false);
-          setCurrentUser(null);
-          setLoading(false);
-        }
+        setCurrentUser(session?.user || null);
+        setLoading(false);
       });
 
       return () => {
@@ -78,72 +56,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         subscription.unsubscribe();
       };
     } else {
-      // Local dev storage fallback
-      const localAuth = sessionStorage.getItem(ADMIN_SESSION_STORAGE_KEY) === 'true';
-      setIsAuthenticated(localAuth);
+      // Offline fallback: when Supabase is not configured, no authenticated user
+      setCurrentUser(null);
       setLoading(false);
-
-      const handleStorage = () => {
-        setIsAuthenticated(sessionStorage.getItem(ADMIN_SESSION_STORAGE_KEY) === 'true');
-      };
-
-      window.addEventListener('storage', handleStorage);
-      return () => {
-        window.removeEventListener('storage', handleStorage);
-      };
     }
   }, [isSupabase]);
 
-  const signIn = async (userOrEmail: string, pass: string): Promise<SignInResult> => {
-    const trimmedInput = userOrEmail.trim();
+  const signIn = async (email: string, pass: string): Promise<SignInResult> => {
+    const trimmedEmail = email.trim();
 
-    // 1. Master/Dev credentials bypass check - ALWAYS supported
-    if (
-      trimmedInput.toLowerCase() === TEMP_ADMIN_CREDENTIALS.username.toLowerCase() &&
-      pass === TEMP_ADMIN_CREDENTIALS.password
-    ) {
-      sessionStorage.setItem(ADMIN_SESSION_STORAGE_KEY, 'true');
-      setIsAuthenticated(true);
-      setCurrentUser(null);
-      return { success: true };
+    if (!isSupabase) {
+      return {
+        success: false,
+        error: 'Supabase authentication is not configured in .env',
+      };
     }
 
-    // 2. If Supabase is configured and not master dev credentials, attempt Supabase Auth
-    if (isSupabase) {
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: trimmedInput,
-          password: pass,
-        });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: trimmedEmail,
+        password: pass,
+      });
 
-        if (error) {
-          return { success: false, error: error.message };
-        }
-
-        if (data.session) {
-          sessionStorage.setItem(ADMIN_SESSION_STORAGE_KEY, 'true');
-          setIsAuthenticated(true);
-          setCurrentUser(data.user);
-          return { success: true };
-        }
-
-        return { success: false, error: 'Could not establish session.' };
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : 'Authentication failed';
-        return { success: false, error: message };
+      if (error) {
+        return { success: false, error: error.message };
       }
-    }
 
-    // Fallback if credentials don't match
-    return {
-      success: false,
-      error: 'Invalid credentials. (Hint: username is bunnyAdmin, password is bunny)',
-    };
+      if (data.session && data.user) {
+        setCurrentUser(data.user);
+        return { success: true };
+      }
+
+      return { success: false, error: 'Could not establish authenticated session.' };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Authentication failed';
+      return { success: false, error: message };
+    }
   };
 
   const signOut = async () => {
-    sessionStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
-    setIsAuthenticated(false);
     setCurrentUser(null);
     if (isSupabase) {
       try {
@@ -157,7 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated,
+        isAuthenticated: Boolean(currentUser),
         isSupabase,
         currentUser,
         loading,

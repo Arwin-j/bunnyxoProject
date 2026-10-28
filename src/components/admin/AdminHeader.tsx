@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { BunnyLogo } from '../common/BunnyLogo';
 
 export const AdminHeader: React.FC = () => {
-  const { signOut } = useAuth();
+  const { signOut, currentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const isEditActive = location.pathname.startsWith('/admin/edit');
@@ -34,13 +34,20 @@ export const AdminHeader: React.FC = () => {
           Bunny Admin
         </Link>
 
-        {/* Temporary login, not secure label - ALWAYS VISIBLE */}
-        <span
-          className="hidden sm:inline-block rounded-full border-2 border-foreground/40 bg-butter/85 px-2.5 py-0.5 text-xs font-mono font-medium"
-          title="Front-end authentication placeholder only. Edits are stored locally."
-        >
-          ⚠️ Temporary login, not secure
-        </span>
+        {currentUser?.email ? (
+          <span
+            className="hidden sm:inline-block rounded-full border border-emerald-600 bg-emerald-50 px-2.5 py-0.5 text-xs font-mono font-bold text-emerald-800"
+            title={`Authenticated via Supabase as ${currentUser.email}`}
+          >
+            🔒 {currentUser.email}
+          </span>
+        ) : (
+          <span
+            className="hidden sm:inline-block rounded-full border border-emerald-600 bg-emerald-50 px-2.5 py-0.5 text-xs font-mono font-bold text-emerald-800"
+          >
+            🔒 Secure Admin
+          </span>
+        )}
       </div>
 
       <nav className="flex items-center gap-2">

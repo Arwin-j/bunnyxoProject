@@ -2,10 +2,10 @@
 
 A cozy, cute community website (sticker-book style: thick outlines, offset shadows, pastel skins, rounded font) for a cozy-games brand with a Discord community.
 
-## ⚠️ Important Note on Temporary Admin & Storage
+## 🔐 Admin Authentication & Cloud Storage
 
-- **Edits made in the Admin area are stored ONLY in your local browser (`localStorage`) under the key `hh.events.v1` until Supabase is connected in a later step. Other public visitors will NOT see changes made in your local browser session.**
-- **The temporary login (`bunnyAdmin` / `bunny`) is a front-end placeholder ONLY and provides NO real security.** It is stored in `src/config/tempAdmin.ts` and evaluated purely client-side with session tracking in `sessionStorage`. Do not store confidential information.
+- **Admin access is secured via Supabase Auth.** Only authenticated users registered in your Supabase project can access administrative panels and perform writes.
+- **Real-time Cloud Sync:** Live events, redemption codes, and community data sync directly with Supabase PostgreSQL tables.
 
 ## ✨ Features
 
@@ -15,7 +15,7 @@ A cozy, cute community website (sticker-book style: thick outlines, offset shado
   - **Events Page (`/events`):** Filter cozy events across platforms: Discord (💬), Heartopia (🌸), Petit Planet (🪐), and Loftia (✨).
   - **Island Map (`/map`), Guides (`/guides`), and Updates (`/updates`):** Cozy sticker-book placeholder pages ready for community expansions.
 - **Admin Area ("Dev Console"):**
-  - **Login (`/admin/login` / `/auth`):** Login form matching the brand theme. Credentials: `bunnyAdmin` / `bunny`.
+  - **Login (`/admin/login` / `/auth`):** Secure login authenticated against Supabase Auth.
   - **Overview (`/admin`):**
     - Real-time counters: **Live**, **Upcoming**, and **Ended** (computed dynamically from UTC timestamps).
     - Dense developer console table with ID, title, platform chip, location, date, time, weekday, status chip, visibility, and quick Edit / Delete actions.

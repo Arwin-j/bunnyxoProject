@@ -466,6 +466,7 @@ export const AdminEditPage: React.FC = () => {
             e.preventDefault();
             handleSave();
           }}
+          autoComplete="off"
           noValidate
         >
           {/* Card Sub-header: "New event" / "New record" */}
@@ -496,6 +497,12 @@ export const AdminEditPage: React.FC = () => {
                 <input
                   id="field-title"
                   type="text"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-form-type="other"
                   maxLength={100}
                   required
                   value={form.title}
@@ -548,6 +555,12 @@ export const AdminEditPage: React.FC = () => {
                 <input
                   id="field-location"
                   type="text"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-form-type="other"
                   value={form.locationChoice === '__other__' ? form.customLocation : form.locationChoice}
                   onChange={(e) => {
                     const val = e.target.value;
@@ -604,6 +617,12 @@ export const AdminEditPage: React.FC = () => {
                 <input
                   id="field-prize"
                   type="text"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-form-type="other"
                   value={form.prize}
                   onChange={(e) => updateField('prize', e.target.value)}
                   placeholder="e.g. Strawberry Basket Decor"
@@ -632,6 +651,11 @@ export const AdminEditPage: React.FC = () => {
                     ref={startDateInputRef}
                     id="field-start-date"
                     type="date"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    data-lpignore="true"
+                    data-form-type="other"
                     required
                     value={form.startDate}
                     onChange={(e) => updateField('startDate', e.target.value)}
@@ -658,6 +682,11 @@ export const AdminEditPage: React.FC = () => {
                     ref={startTimeInputRef}
                     id="field-start-time"
                     type="time"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    data-lpignore="true"
+                    data-form-type="other"
                     required
                     value={form.startTime}
                     onChange={(e) => updateField('startTime', e.target.value)}
@@ -697,6 +726,11 @@ export const AdminEditPage: React.FC = () => {
                     ref={endDateInputRef}
                     id="field-end-date"
                     type="date"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    data-lpignore="true"
+                    data-form-type="other"
                     required
                     value={form.endDate}
                     onChange={(e) => updateField('endDate', e.target.value)}
@@ -723,6 +757,11 @@ export const AdminEditPage: React.FC = () => {
                     ref={endTimeInputRef}
                     id="field-end-time"
                     type="time"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    data-lpignore="true"
+                    data-form-type="other"
                     required
                     value={form.endTime}
                     onChange={(e) => updateField('endTime', e.target.value)}
@@ -756,6 +795,12 @@ export const AdminEditPage: React.FC = () => {
               <textarea
                 id="field-details"
                 rows={4}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-form-type="other"
                 value={form.details}
                 onChange={(e) => updateField('details', e.target.value)}
                 placeholder="Write down the cozy event description, activities, or guidelines..."
@@ -774,6 +819,12 @@ export const AdminEditPage: React.FC = () => {
                   <input
                     id="field-image-url"
                     type="url"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-form-type="other"
                     value={form.imageUrl}
                     onChange={(e) => updateField('imageUrl', e.target.value)}
                     placeholder="https://... (image URL)"

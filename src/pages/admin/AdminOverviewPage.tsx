@@ -175,6 +175,12 @@ export const AdminOverviewPage: React.FC = () => {
           <div className="flex-1 min-w-[200px]">
             <input
               type="search"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              data-lpignore="true"
+              data-form-type="other"
               placeholder="Search by title, location, ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

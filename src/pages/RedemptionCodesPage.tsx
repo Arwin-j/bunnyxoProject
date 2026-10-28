@@ -80,6 +80,12 @@ export const RedemptionCodesPage: React.FC = () => {
           <div className="relative w-full sm:w-72">
             <input
               type="text"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              data-lpignore="true"
+              data-form-type="other"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search code or reward..."

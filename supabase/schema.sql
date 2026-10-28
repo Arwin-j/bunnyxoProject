@@ -61,8 +61,26 @@ CREATE TABLE IF NOT EXISTS public.map_pins (
   name TEXT NOT NULL,
   x DOUBLE PRECISION NOT NULL,
   y DOUBLE PRECISION NOT NULL,
+  cat TEXT DEFAULT 'landmark',
+  subcat TEXT DEFAULT '',
+  owned BOOLEAN DEFAULT false,
+  tags TEXT[] DEFAULT '{}',
+  "desc" TEXT DEFAULT '',
+  image TEXT,
+  game TEXT DEFAULT 'heartopia',
+  map_id TEXT DEFAULT 'island',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Ensure columns exist if table was already created
+ALTER TABLE public.map_pins ADD COLUMN IF NOT EXISTS cat TEXT DEFAULT 'landmark';
+ALTER TABLE public.map_pins ADD COLUMN IF NOT EXISTS subcat TEXT DEFAULT '';
+ALTER TABLE public.map_pins ADD COLUMN IF NOT EXISTS owned BOOLEAN DEFAULT false;
+ALTER TABLE public.map_pins ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}';
+ALTER TABLE public.map_pins ADD COLUMN IF NOT EXISTS "desc" TEXT DEFAULT '';
+ALTER TABLE public.map_pins ADD COLUMN IF NOT EXISTS image TEXT;
+ALTER TABLE public.map_pins ADD COLUMN IF NOT EXISTS game TEXT DEFAULT 'heartopia';
+ALTER TABLE public.map_pins ADD COLUMN IF NOT EXISTS map_id TEXT DEFAULT 'island';
 
 -- ==============================================================================
 -- 3. ROW LEVEL SECURITY (RLS) POLICIES

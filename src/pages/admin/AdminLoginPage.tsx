@@ -6,7 +6,7 @@ export const AdminLoginPage: React.FC = () => {
   const { signIn, isAuthenticated, isSupabase, loading } = useAuth();
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,8 +20,8 @@ export const AdminLoginPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim() || !password) {
-      setError('Please enter both username/email and password.');
+    if (!email.trim() || !password) {
+      setError('Please enter both admin email and password.');
       return;
     }
 
@@ -29,11 +29,11 @@ export const AdminLoginPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const result = await signIn(username, password);
+      const result = await signIn(email, password);
       if (result.success) {
         navigate('/admin', { replace: true });
       } else {
-        setError(result.error || 'Username or password is incorrect.');
+        setError(result.error || 'Email or password is incorrect.');
       }
     } catch {
       setError('An unexpected error occurred. Please try again.');
@@ -52,6 +52,7 @@ export const AdminLoginPage: React.FC = () => {
 
       <form
         onSubmit={handleSubmit}
+        autoComplete="off"
         className="sticker shadow-berry mt-6 w-full rounded-[32px_40px_28px_44px] p-6 sm:p-8 border-[3px] border-foreground bg-card"
         noValidate
       >
@@ -59,7 +60,7 @@ export const AdminLoginPage: React.FC = () => {
           <h1 className="text-center text-3xl font-semibold">Admin Login</h1>
           {isSupabase && (
             <span className="rounded-full border border-emerald-500 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-              Supabase Live
+              Supabase Auth
             </span>
           )}
         </div>
@@ -70,21 +71,26 @@ export const AdminLoginPage: React.FC = () => {
         <div className="mt-6 space-y-4">
           <div>
             <label
-              htmlFor="username"
+              htmlFor="admin-email"
               className="block text-sm font-semibold font-mono text-foreground"
             >
-              Username or Email
+              Admin Email
             </label>
             <input
-              id="username"
-              name="username"
-              type="text"
-              autoComplete="username email"
+              id="admin-email"
+              name="email"
+              type="email"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              data-lpignore="true"
+              data-form-type="other"
               required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="mt-1 w-full rounded-2xl border-[3px] border-foreground bg-background px-4 py-2 text-base font-mono focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="bunnyAdmin or admin@heartopia.com"
+              placeholder="admin@heartopia.com"
               aria-invalid={!!error}
               aria-describedby={error ? 'login-error' : undefined}
             />
@@ -92,16 +98,21 @@ export const AdminLoginPage: React.FC = () => {
 
           <div>
             <label
-              htmlFor="password"
+              htmlFor="admin-password"
               className="block text-sm font-semibold font-mono text-foreground"
             >
               Password
             </label>
             <input
-              id="password"
+              id="admin-password"
               name="password"
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              data-lpignore="true"
+              data-form-type="other"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -130,17 +141,6 @@ export const AdminLoginPage: React.FC = () => {
             ⚠️ {error}
           </p>
         )}
-
-        <div className="mt-6 border-t border-dashed border-foreground/30 pt-4 text-center">
-          <p className="text-xs font-mono text-muted-foreground">
-            Dev access: <code className="bg-muted px-1.5 py-0.5 rounded font-bold">bunnyAdmin</code> / <code className="bg-muted px-1.5 py-0.5 rounded font-bold">bunny</code>
-          </p>
-          {isSupabase && (
-            <p className="mt-1 text-[11px] font-mono text-muted-foreground/80">
-              Supabase Auth is enabled for registered admin accounts.
-            </p>
-          )}
-        </div>
       </form>
     </main>
   );

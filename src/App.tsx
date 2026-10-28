@@ -13,6 +13,7 @@ import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 import { AdminOverviewPage } from './pages/admin/AdminOverviewPage';
 import { AdminEditPage } from './pages/admin/AdminEditPage';
 import { AdminEditCodesPage } from './pages/admin/AdminEditCodesPage';
+import { AdminEditMapsPage } from './pages/admin/AdminEditMapsPage';
 import { AuthProvider } from './hooks/useAuth';
 const PublicLayout: React.FC = () => {
   return (
@@ -76,6 +77,14 @@ export const App: React.FC = () => {
         element={
           <AdminLayout>
             <AdminEditCodesPage />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/edit/maps"
+        element={
+          <AdminLayout>
+            <AdminEditMapsPage />
           </AdminLayout>
         }
       />
