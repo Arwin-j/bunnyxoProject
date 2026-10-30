@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useFeedPosts, FeedPost } from '../hooks/useFeedPosts';
+import { useFeedPosts } from '../hooks/useFeedPosts';
 import { useCountdown } from '../hooks/useCountdown';
 
 // Helper to format ISO date to readable relative time
@@ -13,7 +13,8 @@ function formatRelativeTime(isoString: string): string {
   if (diffHours < 24) return `${diffHours} hours ago`;
   const diffDays = Math.floor(diffHours / 24);
   if (diffDays === 1) return 'Yesterday';
-  return `${diffDays} days ago`;
+  if (diffDays < 7) return `${diffDays} days ago`;
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
 // Sub-component for the 24-hour Countdown Timer badge
@@ -21,29 +22,29 @@ const CountdownWidget: React.FC<{ timestamp: string }> = ({ timestamp }) => {
   const { hours, minutes, seconds, isExpired, formatted, progressPercent } = useCountdown(timestamp, 24);
 
   return (
-    <div className="flex flex-col gap-1.5 rounded-2xl border-2 border-foreground bg-white/95 px-3.5 py-2 shadow-xs backdrop-blur-xs select-none">
+    <div className="flex flex-col gap-1.5 rounded-2xl bg-[#f9f4e6] p-3 select-none border border-[#e9b3ad]/40">
       <div className="flex items-center justify-between gap-3 text-xs font-bold font-sans">
-        <span className="flex items-center gap-1.5 text-rose-600">
+        <span className="flex items-center gap-1.5 text-[#b23a6b]">
           <span className="animate-pulse">⏳</span>
           <span>{isExpired ? 'EXPIRED' : '24H LIFESPAN'}</span>
         </span>
-        <span className="font-mono text-xs sm:text-sm font-bold tracking-wider text-foreground">
+        <span className="font-mono text-xs sm:text-sm font-bold tracking-wider text-[#6b4f35]">
           {isExpired ? '00:00:00' : formatted}
         </span>
       </div>
 
       {/* Progress Bar */}
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-rose-100 border border-foreground/20">
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#fbd5e1]">
         <div
           className={`h-full transition-all duration-1000 ${
-            isExpired ? 'bg-rose-400' : 'bg-rose-500'
+            isExpired ? 'bg-[#8c6f55]' : 'bg-[#b23a6b]'
           }`}
           style={{ width: `${100 - progressPercent}%` }}
           title={`${Math.round(100 - progressPercent)}% time remaining`}
         />
       </div>
 
-      <span className="text-[10px] text-muted-foreground font-mono text-right">
+      <span className="text-[10px] text-[#8c6f55] font-mono text-right">
         {isExpired ? 'Awaiting next daily reel' : `${hours}h ${minutes}m ${seconds}s left`}
       </span>
     </div>
@@ -51,8 +52,8 @@ const CountdownWidget: React.FC<{ timestamp: string }> = ({ timestamp }) => {
 };
 
 export const FeedPage: React.FC = () => {
-  const { featuredPost, gridPosts, resetToDefault } = useFeedPosts();
-  const [filterType, setFilterType] = useState<'ALL' | 'VIDEO' | 'IMAGE'>('ALL');
+  const { featuredPost, gridPosts, isLoading, isLive, error, lastFetched, refreshFeed } = useFeedPosts();
+  const [filterType, setFilterType] = useState<'ALL' | 'VIDEO' | 'CAROUSEL_ALBUM' | 'IMAGE'>('ALL');
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
   const [showApiInfo, setShowApiInfo] = useState(false);
@@ -84,176 +85,186 @@ export const FeedPage: React.FC = () => {
   });
 
   return (
-    <main className="mx-auto max-w-6xl px-3 sm:px-6 py-6 space-y-8 antialiased">
+    <main className="mx-auto max-w-7xl px-3 sm:px-6 py-4 space-y-6 antialiased selection:bg-[#b23a6b] selection:text-white">
       {/* 1. Header & Hero Bar */}
-      <section className="relative overflow-hidden rounded-[28px] border-[3px] border-foreground bg-[#ffe4e6] p-5 sm:p-7 shadow-ink">
+      <section
+        className="card-v2 p-5 sm:p-6"
+        style={{ background: 'linear-gradient(120deg, #fbd5e1, #f6c9b8)' }}
+      >
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-3xl sm:text-4xl select-none" aria-hidden="true">📰</span>
-              <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground font-sans">
+              <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#b23a6b] font-heading">
                 Bunny Hub Feed
               </h1>
-              <span className="rounded-full border-2 border-foreground bg-white px-2.5 py-0.5 text-xs font-bold shadow-xs">
-                Instagram Live
-              </span>
+              <div className="flex items-center gap-1.5 rounded-full bg-[#f3ecda] px-3 py-0.5 text-xs font-bold text-[#6b4f35] shadow-xs select-none">
+                <span className={`size-2.5 rounded-full ${isLive ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`} />
+                <span>{isLive ? 'Instagram Live' : isLoading ? 'Connecting…' : 'Instagram Feed'}</span>
+              </div>
             </div>
-            <p className="text-xs sm:text-sm font-semibold text-foreground/80 font-sans max-w-xl">
-              Daily 24-hour spotlight reel, community snapshots, and official Heartopia updates.
+            <p className="text-xs sm:text-sm font-semibold text-[#6b4f35] font-sans max-w-xl">
+              Live updates, giveaways, guides, and reel highlights directly synced from{' '}
+              <strong className="text-[#b23a6b]">@hey.bunnyxo</strong>.
             </p>
           </div>
 
-          {/* Social Links & Action Pill */}
+          {/* Social Links & Action Pills */}
           <div className="flex flex-wrap items-center gap-2 select-none">
+            <button
+              type="button"
+              onClick={refreshFeed}
+              disabled={isLoading}
+              title="Refresh live posts from Instagram"
+              className="btn-v2 btn-v2-olive text-xs"
+            >
+              <span className={isLoading ? 'animate-spin' : ''}>↻</span>
+              <span>{isLoading ? 'Syncing…' : 'Refresh'}</span>
+            </button>
+
             <a
-              href="https://www.instagram.com"
+              href="https://www.instagram.com/hey.bunnyxo"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 rounded-full border-2 border-foreground bg-white hover:bg-[#fdf2f8] px-3.5 py-1.5 text-xs sm:text-sm font-bold shadow-xs transition-all active:translate-y-0.5"
+              className="btn-v2 text-xs"
             >
-              <span className="text-base">📸</span>
-              <span>@bunnyhub.heartopia</span>
-              <span className="text-muted-foreground text-xs">↗</span>
+              <span>📸</span>
+              <span>@hey.bunnyxo</span>
+              <span className="text-xs">↗</span>
             </a>
 
             <button
               type="button"
               onClick={() => setShowApiInfo((curr) => !curr)}
-              className="flex items-center gap-1 rounded-full border-2 border-foreground/30 bg-white/70 hover:bg-white px-3 py-1.5 text-xs font-bold text-foreground transition-all cursor-pointer"
-              title="View layout & API architecture"
+              className="tab-v2 text-xs py-1.5 px-3 min-h-[34px]"
+              title="View live API endpoint & feed status"
             >
               <span>⚙️</span>
-              <span>{showApiInfo ? 'Hide Tech Info' : 'API Info'}</span>
+              <span>{showApiInfo ? 'Hide Info' : 'API Info'}</span>
             </button>
           </div>
         </div>
 
         {/* Collapsible Architecture & Implementation Notes */}
         {showApiInfo && (
-          <div className="mt-4 rounded-2xl border-2 border-foreground bg-white p-4 shadow-sm space-y-2 text-xs font-sans text-foreground">
-            <div className="flex items-center justify-between font-bold text-sm text-foreground">
+          <div className="mt-4 rounded-2xl bg-[#f3ecda] p-4 shadow-sm space-y-2 text-xs font-sans text-[#6b4f35]">
+            <div className="flex items-center justify-between font-bold text-sm text-[#7a5638]">
               <span className="flex items-center gap-1.5">
                 <span>⚡</span>
-                <span>Production Architecture (Path A: Custom Code in React)</span>
+                <span>Instagram Graph API Live Sync</span>
               </span>
-              <button
-                type="button"
-                onClick={resetToDefault}
-                className="text-xs text-rose-600 hover:underline font-bold"
-              >
-                ↻ Reset Sample Posts & Countdown
-              </button>
+              <span className="text-xs text-[#8c6f55] font-mono">
+                {lastFetched ? `Last synced: ${lastFetched.toLocaleTimeString()}` : ''}
+              </span>
             </div>
-            <p className="text-muted-foreground leading-relaxed">
-              This layout directly implements the <strong>Top vs. Bottom Splitting Logic</strong>:
+            <p className="text-[#8c6f55] leading-relaxed">
+              Connected directly to Instagram Graph API at{' '}
+              <code className="font-mono bg-[#f9f4e6] px-1.5 py-0.5 rounded text-[11px] text-[#6b4f35]">
+                https://graph.instagram.com/me/media?fields=id,caption,media_url,permalink...
+              </code>
             </p>
-            <ul className="list-disc list-inside space-y-1 text-foreground/90 pl-1">
+            {error && (
+              <div className="rounded-xl border border-rose-300 bg-rose-50 p-2 text-rose-800 text-[11px] font-semibold">
+                Notice: {error} (Serving cached live posts)
+              </div>
+            )}
+            <ul className="list-disc list-inside space-y-1 text-[#6b4f35] pl-1">
               <li>
-                <strong>Top Container (Index 0)</strong>: Renders the latest post with an HTML5{' '}
-                <code className="font-mono bg-muted px-1 rounded">&lt;video autoPlay loop muted playsInline&gt;</code>{' '}
-                tag, accompanied by a live 24-hour JavaScript countdown timer calculating remaining lifespan from the creation timestamp.
+                <strong>Spotlight (Post #0)</strong>: Plays latest video reel directly or highlights newest Instagram post with real-time countdown timer.
               </li>
               <li>
-                <strong>Bottom Container (Elements 1..N)</strong>: Maps subsequent posts into a 3-column CSS Grid{' '}
-                <code className="font-mono bg-muted px-1 rounded">grid-cols-3</code> of clickable anchor cards linked to their Instagram permalinks.
+                <strong>Community Grid</strong>: Responsive grid of recent posts, reels, and guide albums with direct permalinks.
               </li>
             </ul>
           </div>
         )}
       </section>
 
-      {/* 2. Top Container: Featured Latest Post (Index 0) with 24-Hour Countdown Timer */}
+      {/* 2. Top Container: Featured Latest Post (Index 0) */}
       {featuredPost && (
         <section className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2">
-              <span className="flex size-3 rounded-full bg-rose-500 animate-ping select-none" />
-              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-foreground font-sans flex items-center gap-2">
+              <span className="flex size-3 rounded-full bg-[#b23a6b] animate-ping select-none" />
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-[#7a5638] font-serif flex items-center gap-2">
                 <span>Featured Daily Spotlight</span>
-                <span className="rounded-full border border-foreground/30 bg-rose-100 text-rose-700 px-2.5 py-0.5 text-xs font-bold">
-                  Post #0
+                <span className="tag-v2">
+                  {featuredPost.media_type === 'VIDEO' ? '🎬 Latest Reel' : '📸 Latest Post'}
                 </span>
               </h2>
             </div>
-            <span className="hidden sm:inline-block text-xs font-mono font-bold text-muted-foreground">
-              Auto-refreshes daily
+            <span className="hidden sm:inline-block text-xs font-mono font-bold text-[#8c6f55]">
+              Live from Instagram
             </span>
           </div>
 
-          <div className="overflow-hidden rounded-[24px] border-[3px] border-foreground bg-card shadow-ink">
-            <div className="grid grid-cols-1 lg:grid-cols-12">
+          <div className="overflow-hidden rounded-[24px] bg-[#f3ecda] p-3 sm:p-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
               {/* Left Column: Media Player (Video or Image) */}
-              <div className="relative lg:col-span-7 bg-black flex items-center justify-center min-h-[300px] sm:min-h-[420px] max-h-[560px] overflow-hidden">
+              <div className="lg:col-span-7 relative flex items-center justify-center bg-black/5 rounded-2xl overflow-hidden aspect-video sm:aspect-[16/10] max-h-[460px]">
                 {featuredPost.media_type === 'VIDEO' ? (
-                  <video
-                    ref={videoRef}
-                    src={featuredPost.media_url}
-                    poster={featuredPost.thumbnail_url}
-                    autoPlay
-                    loop
-                    muted={isMuted}
-                    playsInline
-                    className="h-full w-full object-cover select-none"
-                  />
+                  <>
+                    <video
+                      ref={videoRef}
+                      src={featuredPost.media_url}
+                      poster={featuredPost.thumbnail_url}
+                      className="w-full h-full object-cover rounded-2xl"
+                      autoPlay
+                      loop
+                      muted={isMuted}
+                      playsInline
+                    />
+                    {/* Media controls overlay */}
+                    <div className="absolute bottom-3 right-3 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={togglePlay}
+                        aria-label={isPlaying ? 'Pause video' : 'Play video'}
+                        className="size-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center text-xs backdrop-blur-xs transition-transform active:scale-95 cursor-pointer"
+                      >
+                        {isPlaying ? '⏸' : '▶'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={toggleMute}
+                        aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+                        className="size-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center text-xs backdrop-blur-xs transition-transform active:scale-95 cursor-pointer"
+                      >
+                        {isMuted ? '🔇' : '🔊'}
+                      </button>
+                    </div>
+                  </>
                 ) : (
                   <img
                     src={featuredPost.media_url}
-                    alt={featuredPost.caption}
-                    className="h-full w-full object-cover select-none"
+                    alt={featuredPost.caption || 'Featured post'}
+                    className="w-full h-full object-cover rounded-2xl"
                   />
-                )}
-
-                {/* Floating Top Left Badge */}
-                <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full border-1.5 border-white/80 bg-black/60 px-3 py-1 text-xs font-bold text-white shadow-xs backdrop-blur-xs select-none">
-                  <span className="size-2 rounded-full bg-red-500 animate-pulse" />
-                  <span>24H DAILY REEL</span>
-                </div>
-
-                {/* Floating Media Controls on Bottom Right */}
-                {featuredPost.media_type === 'VIDEO' && (
-                  <div className="absolute bottom-3 right-3 flex items-center gap-1.5 select-none">
-                    <button
-                      type="button"
-                      onClick={togglePlay}
-                      aria-label={isPlaying ? 'Pause video' : 'Play video'}
-                      className="size-8 rounded-full border border-white/70 bg-black/60 text-white text-xs flex items-center justify-center hover:bg-black/90 transition-all cursor-pointer"
-                    >
-                      {isPlaying ? '⏸' : '▶'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={toggleMute}
-                      aria-label={isMuted ? 'Unmute video' : 'Mute video'}
-                      className="size-8 rounded-full border border-white/70 bg-black/60 text-white text-xs flex items-center justify-center hover:bg-black/90 transition-all cursor-pointer"
-                    >
-                      {isMuted ? '🔇' : '🔊'}
-                    </button>
-                  </div>
                 )}
               </div>
 
-              {/* Right Column: Metadata, Countdown Timer & Linkout */}
-              <div className="lg:col-span-5 p-5 sm:p-6 flex flex-col justify-between gap-5 bg-card border-t-[3px] lg:border-t-0 lg:border-l-[3px] border-foreground">
-                <div className="space-y-4">
+              {/* Right Column: Metadata & Caption */}
+              <div className="lg:col-span-5 flex flex-col justify-between p-2 space-y-4">
+                <div className="space-y-3">
                   {/* Author Header */}
-                  <div className="flex items-center justify-between border-b-2 border-dashed border-foreground/20 pb-3">
+                  <div className="flex items-center justify-between gap-2 border-b border-[#e9b3ad]/40 pb-2">
                     <div className="flex items-center gap-2.5">
-                      <div className="size-10 rounded-full border-2 border-foreground bg-[#ffe4e6] flex items-center justify-center text-lg shadow-xs select-none">
+                      <div className="size-9 rounded-full bg-[#fbd5e1] flex items-center justify-center text-lg shadow-xs">
                         {featuredPost.author_avatar || '🐰'}
                       </div>
                       <div>
                         <div className="flex items-center gap-1">
-                          <span className="font-bold font-sans text-sm text-foreground">
+                          <span className="font-heading font-semibold text-sm text-[#7a5638]">
                             {featuredPost.author}
                           </span>
-                          <span className="text-xs text-blue-500" title="Verified Creator">✓</span>
+                          <span className="text-xs text-[#b23a6b] font-bold" title="Official Creator">✓</span>
                         </div>
-                        <span className="font-mono text-xs text-muted-foreground">
+                        <span className="font-mono text-xs text-[#8c6f55]">
                           {featuredPost.author_handle}
                         </span>
                       </div>
                     </div>
-                    <span className="text-xs font-mono font-semibold text-muted-foreground">
+                    <span className="text-xs font-mono font-semibold text-[#8c6f55]">
                       {formatRelativeTime(featuredPost.timestamp)}
                     </span>
                   </div>
@@ -263,14 +274,14 @@ export const FeedPage: React.FC = () => {
 
                   {/* Caption & Tags */}
                   <div className="space-y-2">
-                    <p className="text-xs sm:text-sm font-sans font-medium text-foreground leading-relaxed">
+                    <p className="text-xs sm:text-sm font-sans font-medium text-[#6b4f35] leading-relaxed line-clamp-4">
                       {featuredPost.caption}
                     </p>
                     <div className="flex flex-wrap gap-1.5 pt-1">
                       {featuredPost.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="rounded-full bg-[#fce7f3] border border-foreground/20 px-2 py-0.5 font-mono text-[11px] font-bold text-rose-700"
+                          className="tag-v2 text-[11px]"
                         >
                           #{tag}
                         </span>
@@ -280,26 +291,15 @@ export const FeedPage: React.FC = () => {
                 </div>
 
                 {/* Footer Interactions & Instagram Link */}
-                <div className="space-y-3 pt-3 border-t-2 border-dashed border-foreground/20">
-                  <div className="flex items-center justify-between text-xs font-bold font-mono text-muted-foreground px-1">
-                    <span className="flex items-center gap-1">
-                      <span>❤️</span>
-                      <span>{featuredPost.likes.toLocaleString()} likes</span>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span>💬</span>
-                      <span>{featuredPost.comments.toLocaleString()} comments</span>
-                    </span>
-                  </div>
-
+                <div className="space-y-3 pt-3 border-t border-[#e9b3ad]/40">
                   <a
                     href={featuredPost.permalink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-foreground bg-primary hover:bg-accent py-2.5 px-4 font-sans text-sm sm:text-base font-bold text-foreground shadow-ink active:translate-y-0.5 transition-all select-none"
+                    className="btn-v2 w-full text-center"
                   >
                     <span>📸</span>
-                    <span>Watch on Instagram</span>
+                    <span>View Reel on Instagram</span>
                     <span className="text-xs">↗</span>
                   </a>
                 </div>
@@ -309,70 +309,79 @@ export const FeedPage: React.FC = () => {
         </section>
       )}
 
-      {/* 3. Bottom Container: Elements 1 through N in a 3-Column CSS Grid */}
+      {/* 3. Bottom Container: Grid of Recent Instagram Posts */}
       <section className="space-y-4 pt-2">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-dashed border-foreground/20 pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e9b3ad]/40 pb-3">
           <div className="flex items-center gap-2">
             <span className="text-2xl select-none">📸</span>
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground font-sans flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#7a5638] font-serif flex items-center gap-2">
                 <span>Recent Community Posts</span>
-                <span className="rounded-full border border-foreground bg-white px-2.5 py-0.5 text-xs font-bold shadow-xs">
+                <span className="tag-v2">
                   {filteredGridPosts.length}
                 </span>
               </h2>
-              <p className="text-xs font-medium text-muted-foreground font-sans">
-                Posts starting from the 2nd newest onward (skipping featured post #0).
+              <p className="text-xs font-medium text-[#8c6f55] font-sans">
+                Latest updates, giveaway winners, and guides from @hey.bunnyxo.
               </p>
             </div>
           </div>
 
           {/* Media Filter Tabs */}
-          <div className="flex items-center rounded-full border-2 border-foreground bg-card p-1 shadow-xs select-none">
-            {(['ALL', 'VIDEO', 'IMAGE'] as const).map((type) => (
+          <div className="flex items-center gap-1">
+            {(
+              [
+                { key: 'ALL', label: 'All' },
+                { key: 'VIDEO', label: 'Reels 🎬' },
+                { key: 'CAROUSEL_ALBUM', label: 'Albums 📸' },
+                { key: 'IMAGE', label: 'Photos 🖼️' },
+              ] as const
+            ).map((tab) => (
               <button
-                key={type}
+                key={tab.key}
                 type="button"
-                onClick={() => setFilterType(type)}
-                className={`rounded-full px-3 py-1 font-sans text-xs font-bold transition-all cursor-pointer ${
-                  filterType === type
-                    ? 'bg-primary text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
+                onClick={() => setFilterType(tab.key)}
+                className={`tab-v2 text-xs py-1 px-3 min-h-[32px] ${
+                  filterType === tab.key ? 'on' : ''
                 }`}
               >
-                {type === 'ALL' ? 'All' : type === 'VIDEO' ? 'Reels 🎬' : 'Photos 📷'}
+                {tab.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* 3-Column CSS Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {/* 3-Column Responsive Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredGridPosts.map((post) => (
             <a
               key={post.id}
               href={post.permalink}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative flex flex-col justify-between overflow-hidden rounded-[22px] border-[2.5px] border-foreground bg-card shadow-ink transition-all duration-150 hover:-translate-y-1 hover:shadow-[5px_5px_0_0_var(--foreground)] active:translate-y-0.5 cursor-pointer"
+              className="card-v2 p-3 group relative flex flex-col justify-between overflow-hidden transition-all duration-150 hover:-translate-y-1 cursor-pointer no-underline text-inherit"
             >
               {/* Media Thumbnail Container */}
-              <div className="relative aspect-4/3 w-full overflow-hidden bg-black/10 border-b-2 border-foreground">
+              <div className="relative aspect-square w-full overflow-hidden bg-black/5 rounded-2xl">
                 <img
-                  src={post.media_type === 'VIDEO' ? (post.thumbnail_url || post.media_url) : post.media_url}
+                  src={post.thumbnail_url || post.media_url}
                   alt={post.caption}
                   className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
                 />
 
                 {/* Media Type Badge */}
-                <div className="absolute top-2.5 left-2.5 rounded-full border border-white/80 bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white shadow-xs backdrop-blur-xs select-none">
-                  {post.media_type === 'VIDEO' ? '🎬 REEL' : '📷 PHOTO'}
+                <div className="absolute top-2.5 left-2.5 rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] font-bold text-white shadow-xs backdrop-blur-xs select-none">
+                  {post.media_type === 'VIDEO'
+                    ? '🎬 REEL'
+                    : post.media_type === 'CAROUSEL_ALBUM'
+                    ? '📸 ALBUM'
+                    : '🖼️ PHOTO'}
                 </div>
 
                 {/* Hover Instagram Overlay Pill */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
-                  <span className="flex items-center gap-1.5 rounded-full border-2 border-white bg-white/95 px-3.5 py-1.5 text-xs font-bold text-foreground shadow-md transition-transform group-hover:scale-105">
+                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+                  <span className="btn-v2 text-xs py-1.5 px-3">
                     <span>View on Instagram</span>
                     <span>↗</span>
                   </span>
@@ -380,33 +389,30 @@ export const FeedPage: React.FC = () => {
               </div>
 
               {/* Card Body */}
-              <div className="p-4 flex flex-col justify-between flex-1 gap-3">
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
-                    <span className="font-bold text-foreground flex items-center gap-1">
+              <div className="pt-3 flex flex-col justify-between flex-1 gap-2">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-[11px] font-mono text-[#8c6f55]">
+                    <span className="font-bold text-[#6b4f35] flex items-center gap-1">
                       <span>{post.author_avatar || '🐰'}</span>
                       <span className="truncate max-w-[130px]">{post.author_handle}</span>
                     </span>
                     <span>{formatRelativeTime(post.timestamp)}</span>
                   </div>
 
-                  <p className="font-sans text-xs font-medium text-foreground line-clamp-2 leading-snug">
+                  <p className="font-sans text-xs font-medium text-[#6b4f35] line-clamp-3 leading-snug">
                     {post.caption}
                   </p>
                 </div>
 
-                {/* Card Footer: Likes & Comments */}
-                <div className="flex items-center justify-between pt-2 border-t border-dashed border-foreground/20 text-[11px] font-mono font-bold text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <span>❤️</span>
-                    <span>{post.likes.toLocaleString()}</span>
+                {/* Card Footer: Tags & Link indicator */}
+                <div className="flex items-center justify-between pt-2 border-t border-[#e9b3ad]/40 text-[11px] font-mono font-bold text-[#8c6f55]">
+                  <span className="truncate max-w-[180px] text-[#b23a6b]">
+                    {post.tags[0] ? `#${post.tags[0]}` : '#Heartopia'}
+                    {post.tags[1] ? ` #${post.tags[1]}` : ''}
                   </span>
-                  <span className="flex items-center gap-1">
-                    <span>💬</span>
-                    <span>{post.comments.toLocaleString()}</span>
-                  </span>
-                  <span className="text-primary group-hover:translate-x-0.5 transition-transform">
-                    →
+                  <span className="text-[#b23a6b] group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                    <span>Open</span>
+                    <span>→</span>
                   </span>
                 </div>
               </div>

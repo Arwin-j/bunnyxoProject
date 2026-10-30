@@ -46,6 +46,179 @@
   filter: contrast(1.07) saturate(1.16) brightness(1.03);
 }
 
+/* ========================================================
+   Bunny xo v2 Theme Palette (Warm Blush, Sage Olive & Cream)
+   ======================================================== */
+:root {
+  /* V2 Reference Tokens */
+  --bg-page: #f3d2cb;
+  --bg-card: #f3ecda;
+  --bg-row: #f9f4e6;
+  --nav-green: #a9ad73;
+  --olive-dark: #6e7a3c;
+  --berry-rose: #b23a6b;
+  --text-main: #6b4f35;
+  --text-heading: #7a5638;
+  --peach-accent: #e9b3ad;
+  --peach-gradient-start: #fbd5e1;
+  --peach-gradient-end: #f6c9b8;
+
+  /* Global Semantic Token Overrides */
+  --background: #f3d2cb;
+  --foreground: #6b4f35;
+  --card: #f3ecda;
+  --card-foreground: #6b4f35;
+  --muted: #e9b3ad;
+  --muted-foreground: #8c6f55;
+  --primary: #b23a6b;
+  --primary-foreground: #ffffff;
+  --accent: #f9f4e6;
+  --accent-foreground: #7a5638;
+  --mint: #a9ad73;
+  --butter: #f3ecda;
+  --sky: #d9e0b4;
+  --lilac: #fbd5e1;
+
+  --font-sans: "Nunito", "Fredoka", ui-rounded, system-ui, sans-serif;
+  --font-heading: "Fredoka", ui-rounded, sans-serif;
+  --font-serif: "Lora", Georgia, serif;
+}
+
+body {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  font-family: var(--font-sans) !important;
+  background-image: none !important;
+}
+
+/* V2 Core Components & Utilities */
+.btn-v2 {
+  background: #b23a6b;
+  color: #ffffff;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  min-height: 38px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.btn-v2:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+.btn-v2:active {
+  transform: translateY(1px);
+}
+.btn-v2-olive {
+  background: #6e7a3c !important;
+  color: #ffffff !important;
+}
+.btn-v2-white {
+  background: #f3ecda !important;
+  color: #b23a6b !important;
+}
+
+.card-v2 {
+  background: #f3ecda;
+  border-radius: 24px;
+  padding: 18px;
+  box-sizing: border-box;
+  color: #6b4f35;
+}
+
+.row-v2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background: #f9f4e6;
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #6b4f35;
+}
+
+.tag-v2 {
+  background: #e9b3ad;
+  color: #6b4f35;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tab-v2 {
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  min-height: 38px;
+  background: #fff3f0;
+  color: #6b4f35;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.tab-v2:hover {
+  background: #ffebe5;
+}
+.tab-v2.on {
+  background: #b23a6b !important;
+  color: #ffffff !important;
+}
+
+.tm-v2 {
+  background: #f3ecda;
+  color: #b23a6b;
+  border-radius: 16px;
+  padding: 10px 0;
+  text-align: center;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 28px;
+  line-height: 1;
+}
+.tm-v2 small {
+  display: block;
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  color: #6b4f35;
+  margin-top: 4px;
+}
+
+.wk-v2 {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #f3ecda;
+  border-radius: 20px;
+  padding: 14px;
+  color: #6b4f35;
+}
+
+.ph-v2 {
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f6c9b8, #e9b3ad);
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  box-sizing: border-box;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b4f35;
+}
+
 /* Cute Tulip & Comfy Green Theme Styles */
 :root {
   --tulip-pink: #f48fb1;
@@ -68,6 +241,106 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 input[type="date"]::-webkit-calendar-picker-indicator:hover,
 input[type="time"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
+}
+
+/* ========================================================
+   Custom Themed Cursors & Hand Icons (Bunny Hub Suite)
+   ======================================================== */
+:root {
+  --cursor-default: url('/cursors/default.svg') 4 3, auto;
+  --cursor-pointer: url('/cursors/pointer.svg') 10 2, pointer;
+  --cursor-grab: url('/cursors/grab.svg') 14 14, grab;
+  --cursor-grabbing: url('/cursors/grabbing.svg') 14 14, grabbing;
+}
+
+/* Base Body & Document Default Cursor */
+html,
+body {
+  cursor: var(--cursor-default);
+}
+
+/* Clickable Interactive Elements: Custom Hand Icon */
+a,
+button,
+[role="button"],
+select,
+summary,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"],
+input[type="file"]::file-selector-button,
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+.cursor-pointer,
+[class*="cursor-pointer"],
+[style*="cursor: pointer"] {
+  cursor: var(--cursor-pointer) !important;
+}
+
+/* Explicit default cursor */
+.cursor-default,
+[class*="cursor-default"],
+[style*="cursor: default"] {
+  cursor: var(--cursor-default) !important;
+}
+
+/* Text Fields maintain text selection I-beam */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="url"],
+textarea,
+[contenteditable="true"] {
+  cursor: text;
+}
+
+/* Draggable Elements: Open / Grabbing Hand Icons */
+.cursor-grab,
+[class*="cursor-grab"],
+.leaflet-grab,
+.leaflet-container.leaflet-grab,
+[style*="cursor: grab"] {
+  cursor: var(--cursor-grab) !important;
+}
+
+.cursor-grabbing,
+[class*="cursor-grabbing"],
+.leaflet-grabbing,
+.leaflet-container.leaflet-grabbing,
+[style*="cursor: grabbing"],
+:active.cursor-grab,
+:active.leaflet-grab,
+[class*="cursor-grab"]:active,
+[style*="cursor: grab"]:active {
+  cursor: var(--cursor-grabbing) !important;
+}
+
+/* Map Interactive Pins */
+.interactive-pin,
+.heartopia-map-pin,
+.leaflet-interactive {
+  cursor: var(--cursor-pointer) !important;
+}
+
+.interactive-pin.editable {
+  cursor: var(--cursor-grab) !important;
+}
+
+.interactive-pin.editable:active {
+  cursor: var(--cursor-grabbing) !important;
+}
+
+/* Disabled State */
+button:disabled,
+[disabled],
+.cursor-not-allowed,
+[class*="cursor-not-allowed"],
+[style*="cursor: not-allowed"] {
+  cursor: not-allowed !important;
 }
 
 /* Custom Themed Tulip Pin Cursor */
@@ -142,6 +415,12 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   justify-content: center;
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
   user-select: none;
+  cursor: pointer;
+}
+
+.interactive-pin:not(.editable),
+.interactive-pin:not(.editable) * {
+  cursor: var(--cursor-pointer, pointer) !important;
 }
 
 .interactive-pin span {
@@ -194,7 +473,7 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .bunny-map-popup .leaflet-popup-close-button:hover {
-  color: #f48fb1 !important;
+  color: #b23a6b !important;
 }
 
 /* Boxed Heartopia Map Layout & Canvas */
@@ -231,10 +510,10 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 
 .heartopia-canvas-wrapper {
   position: relative;
-  border-radius: 28px;
-  border: 3px solid var(--foreground);
-  background: var(--card);
-  box-shadow: 5px 5px 0 0 #f472b6;
+  border-radius: 24px;
+  border: 3px solid #6b4f35;
+  background: #f3ecda;
+  box-shadow: 4px 4px 0 0 #6e7a3c;
   overflow: hidden;
   width: 100%;
   height: 480px;
@@ -248,10 +527,10 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 
 .admin-map-canvas-wrapper {
   position: relative;
-  border-radius: 28px;
-  border: 3px solid var(--foreground);
-  background: #f3dbe6;
-  box-shadow: 4px 4px 0 0 var(--foreground);
+  border-radius: 24px;
+  border: 3px solid #6b4f35;
+  background: #f3ecda;
+  box-shadow: 4px 4px 0 0 #6e7a3c;
   overflow: hidden;
   width: 100%;
   height: 460px;
@@ -269,13 +548,13 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   min-height: 360px;
 }
 
-/* Redemption Codes Page (Comfy Light Green Theme) */
+/* Redemption Codes Page (V2 Theme) */
 .codes-page-hero {
   border-radius: 28px;
-  border: 3px solid var(--foreground);
-  background: #dcfce7;
+  border: 0;
+  background: linear-gradient(120deg, #fbd5e1, #f6c9b8);
   padding: 1.5rem;
-  box-shadow: 5px 5px 0 0 #15803d;
+  color: #6b4f35;
 }
 
 .codes-grid {
@@ -286,33 +565,33 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 
 .code-card {
   border-radius: 24px;
-  border: 3px solid var(--foreground);
-  background: #f0fdf4;
+  border: 0;
+  background: #f3ecda;
   padding: 1.25rem;
-  box-shadow: 4px 4px 0 0 #15803d;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 1rem;
+  color: #6b4f35;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .code-card:hover {
   transform: translateY(-2px);
-  box-shadow: 6px 6px 0 0 #15803d;
+  box-shadow: 0 4px 12px rgba(107, 79, 53, 0.08);
 }
 
 .code-badge-gift {
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  border: 2px solid var(--foreground);
-  background: #bbf7d0;
+  border: 0;
+  background: #e9b3ad;
+  color: #6b4f35;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
-  box-shadow: 2px 2px 0 0 var(--foreground);
   flex-shrink: 0;
 }
 
@@ -322,16 +601,15 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   justify-content: space-between;
   gap: 0.5rem;
   border-radius: 9999px;
-  border: 2px solid var(--foreground);
-  background: #ffffff;
-  padding: 0.4rem 0.75rem 0.4rem 1rem;
-  box-shadow: 2px 2px 0 0 var(--foreground);
+  border: 0;
+  background: #f9f4e6;
+  padding: 0.45rem 0.85rem 0.45rem 1rem;
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
 .code-pill-box:hover {
-  background-color: #dcfce7;
+  background-color: #ffffff;
 }
 
 /* History Codes Grid: 3 or 4 per row with responsive spacing */
@@ -365,10 +643,9 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 /* History / Expired Code Compact Curved Box */
 .history-code-square {
   border-radius: 18px;
-  border: 2px solid #dc2626;
-  background-color: #ffffff;
+  border: 0;
+  background-color: #f3ecda;
   padding: 0.85rem 1rem;
-  box-shadow: 2.5px 2.5px 0 0 #dc2626;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -377,7 +654,8 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   gap: 0.45rem;
   min-height: 96px;
   width: 100%;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  color: #8c6f55;
+  transition: transform 0.15s ease, background-color 0.15s ease;
   user-select: none;
   box-sizing: border-box;
 }

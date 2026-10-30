@@ -48,25 +48,14 @@ export interface PinCategory {
   label: string;
   color: string;
   icon: string;
+  image?: string | null;
   size?: number;
 }
 
 export const PIN_CATEGORIES: Record<string, PinCategory> = {
-  region: { id: 'region', label: 'Regions', color: '#6b8f5e', icon: '◆', size: 28 },
   landmark: { id: 'landmark', label: 'Landmarks', color: '#c3a468', icon: '★', size: 28 },
-  plot: { id: 'plot', label: 'Numbered Plots', color: '#8aab9c', icon: '▢', size: 22 },
-  water: { id: 'water', label: 'Seas & Water', color: '#5f9a8c', icon: '≈', size: 28 },
-  ore: { id: 'ore', label: 'Ore', color: '#7a8ba0', icon: '⛏️', size: 24 },
-  stone: { id: 'stone', label: 'Stone', color: '#a39c8f', icon: '◆', size: 24 },
-  blueberry: { id: 'blueberry', label: 'Blueberry', color: '#4a5fc1', icon: '🫐', size: 24 },
-  oyster: { id: 'oyster', label: 'Oyster Mushroom', color: '#8e97a8', icon: '🍄', size: 24 },
-  penny_bun: { id: 'penny_bun', label: 'Penny Bun', color: '#8a6a4a', icon: '🍄', size: 24 },
-  button: { id: 'button', label: 'Button Mushroom', color: '#c9b898', icon: '🍄', size: 24 },
-  raspberry: { id: 'raspberry', label: 'Raspberry', color: '#c23b5e', icon: '🍇', size: 24 },
-  apple: { id: 'apple', label: 'Apple', color: '#c0392b', icon: '🍎', size: 24 },
-  mandarin: { id: 'mandarin', label: 'Mandarin', color: '#e2932a', icon: '🍊', size: 24 },
-  shiitake: { id: 'shiitake', label: 'Shiitake Mushroom', color: '#7a5230', icon: '🍄', size: 24 },
-  truffle: { id: 'truffle', label: 'Black Truffle', color: '#2d3748', icon: '🍄', size: 24 },
+  region: { id: 'region', label: 'Regions', color: '#6b8f5e', icon: '◆', size: 28 },
+  chest: { id: 'chest', label: 'Chests', color: '#e2932a', icon: '🎁', size: 26 },
 };
 
 export interface PinTagDef {
@@ -239,7 +228,7 @@ export const DEFAULT_ISLAND_PINS: InteractivePin[] = [
   {
     id: 'plot_01',
     name: 'Plot 01',
-    cat: 'plot',
+    cat: 'landmark',
     x: 769.4 + OFFSET,
     y: 1460.6 + OFFSET,
     desc: 'Numbered plot near Fishing Village.',
@@ -249,7 +238,7 @@ export const DEFAULT_ISLAND_PINS: InteractivePin[] = [
   {
     id: 'plot_02',
     name: 'Plot 02',
-    cat: 'plot',
+    cat: 'landmark',
     x: 683.9 + OFFSET,
     y: 1246.9 + OFFSET,
     desc: 'Numbered plot in the southwest ring.',
@@ -259,7 +248,7 @@ export const DEFAULT_ISLAND_PINS: InteractivePin[] = [
   {
     id: 'plot_05',
     name: 'Plot 05',
-    cat: 'plot',
+    cat: 'landmark',
     x: 854.9 + OFFSET,
     y: 584.2 + OFFSET,
     desc: 'Numbered plot at northern edge, near Onsen Mountain.',
@@ -267,13 +256,13 @@ export const DEFAULT_ISLAND_PINS: InteractivePin[] = [
     mapId: 'island',
   },
   {
-    id: 'shiitake_01',
-    name: 'Shiitake Grove',
-    cat: 'shiitake',
+    id: 'chest_01',
+    name: 'Hidden Island Chest',
+    cat: 'chest',
     subcat: 'Rare',
     x: 1185.9 + OFFSET,
     y: 1009.2 + OFFSET,
-    desc: 'Shiitake mushroom spawn point in the suburban grove.',
+    desc: 'Treasure chest spawn point in the suburban grove.',
     tags: ['rainy'],
     game: 'heartopia',
     mapId: 'island',

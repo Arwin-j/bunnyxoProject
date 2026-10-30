@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { BunnyLogo } from '../common/BunnyLogo';
 
@@ -8,6 +8,7 @@ export const AdminHeader: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isEditActive = location.pathname.startsWith('/admin/edit');
+  const isOverviewActive = location.pathname === '/admin' || location.pathname === '/admin/overview';
 
   const handleLogout = () => {
     signOut();
@@ -15,78 +16,81 @@ export const AdminHeader: React.FC = () => {
   };
 
   return (
-    <header className="flex flex-wrap items-center justify-between gap-3 border-b-[3px] border-dashed border-primary bg-background px-4 py-2.5 shadow-xs">
-      <div className="flex items-center gap-2 sm:gap-3">
-        {/* Match logo from main site navigation bar */}
+    <header className="sticky top-2 z-30 px-3 sm:px-6 pt-2 pb-1 max-w-7xl mx-auto w-full">
+      <nav className="flex items-center gap-2 sm:gap-3 flex-wrap bg-[#a9ad73] rounded-[26px] p-2 sm:px-4 sm:py-2.5 shadow-sm">
+        {/* Circular Dashed Logo */}
         <Link
           to="/admin"
-          aria-label="Admin Overview"
-          title="Admin Overview"
-          className="shrink-0 flex items-center"
+          aria-label="Bunny Admin Overview"
+          title="Bunny Admin"
+          className="size-11 sm:size-12 rounded-full bg-[#fbd5e1] border-[3px] border-dashed border-white flex items-center justify-center font-heading font-bold text-[#b23a6b] text-xs shrink-0 hover:scale-105 transition-transform"
         >
-          <BunnyLogo className="bob h-5 sm:h-6 w-auto shrink-0 select-none object-contain" />
+          <BunnyLogo className="h-6 w-auto object-contain select-none" />
         </Link>
 
         <Link
           to="/admin"
-          className="text-lg sm:text-xl font-bold tracking-tight text-foreground hover:opacity-85"
+          className="font-heading font-bold text-base sm:text-lg text-white hover:opacity-90 tracking-tight"
         >
           Bunny Admin
         </Link>
 
-        {currentUser?.email ? (
-          <span
-            className="hidden sm:inline-block rounded-full border border-emerald-600 bg-emerald-50 px-2.5 py-0.5 text-xs font-mono font-bold text-emerald-800"
-            title={`Authenticated via Supabase as ${currentUser.email}`}
-          >
+        {currentUser?.email && (
+          <span className="hidden md:inline-block rounded-full bg-[#f3ecda] px-3 py-1 text-xs font-mono font-bold text-[#6b4f35]">
             🔒 {currentUser.email}
           </span>
-        ) : (
-          <span
-            className="hidden sm:inline-block rounded-full border border-emerald-600 bg-emerald-50 px-2.5 py-0.5 text-xs font-mono font-bold text-emerald-800"
-          >
-            🔒 Secure Admin
-          </span>
         )}
-      </div>
 
-      <nav className="flex items-center gap-2">
-        {/* Edit button with tool icon */}
-        <Link
-          to="/admin/edit"
-          className={`flex items-center gap-1.5 rounded-full border-[2.5px] px-3.5 py-1 text-xs sm:text-sm font-semibold transition-all active:translate-y-0.5 ${
-            isEditActive
-              ? 'bg-primary border-foreground shadow-ink text-foreground'
-              : 'border-foreground/30 bg-card hover:bg-accent hover:border-foreground text-foreground'
-          }`}
-        >
-          <span aria-hidden="true">🔧</span>
-          <span>Edit</span>
-        </Link>
+        <div className="flex-1 min-w-0" />
 
-        <div className="h-5 w-[2px] bg-foreground/20 mx-1" />
+        {/* Navigation Pills */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <Link
+            to="/admin/overview"
+            className={`rounded-full px-3.5 py-1.5 font-heading font-semibold text-xs sm:text-sm transition-all select-none active:translate-y-0.5 ${
+              isOverviewActive
+                ? 'bg-[#b23a6b] text-white shadow-xs'
+                : 'bg-[#f3ecda] text-[#b23a6b] hover:bg-white'
+            }`}
+          >
+            📊 Overview
+          </Link>
 
-        <Link
-          to="/home"
-          target="_blank"
-          rel="noopener noreferrer"
-          title="Open public website in new tab"
-          className="flex items-center gap-1 rounded-full border-2 border-foreground/30 bg-card px-2.5 py-1 text-xs sm:text-sm font-semibold hover:bg-accent hover:border-foreground transition-all"
-        >
-          <span>🌐</span>
-          <span className="hidden md:inline">View Site ↗</span>
-        </Link>
+          <Link
+            to="/admin/edit"
+            className={`rounded-full px-3.5 py-1.5 font-heading font-semibold text-xs sm:text-sm transition-all select-none active:translate-y-0.5 ${
+              isEditActive
+                ? 'bg-[#b23a6b] text-white shadow-xs'
+                : 'bg-[#f3ecda] text-[#b23a6b] hover:bg-white'
+            }`}
+          >
+            🔧 Edit
+          </Link>
 
-        <button
-          type="button"
-          onClick={handleLogout}
-          title="Sign out of temporary admin session"
-          className="cursor-pointer flex items-center gap-1 rounded-full border-2 border-foreground/30 bg-card px-2.5 py-1 text-xs sm:text-sm font-semibold hover:bg-primary/40 hover:border-foreground transition-all active:translate-y-0.5"
-        >
-          <span>🚪</span>
-          <span className="hidden md:inline">Log out</span>
-        </button>
+          <Link
+            to="/home"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open public website in new tab"
+            className="rounded-full px-3 py-1.5 font-heading font-semibold text-xs sm:text-sm bg-[#f3ecda] text-[#6b4f35] hover:bg-white transition-all select-none flex items-center gap-1"
+          >
+            <span>🌐</span>
+            <span className="hidden sm:inline">View Site ↗</span>
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            title="Sign out of admin session"
+            className="cursor-pointer rounded-full px-3 py-1.5 font-heading font-semibold text-xs sm:text-sm bg-[#f3ecda] text-[#b23a6b] hover:bg-white transition-all select-none flex items-center gap-1"
+          >
+            <span>🚪</span>
+            <span className="hidden sm:inline">Log out</span>
+          </button>
+        </div>
       </nav>
     </header>
   );
 };
+
+export default AdminHeader;

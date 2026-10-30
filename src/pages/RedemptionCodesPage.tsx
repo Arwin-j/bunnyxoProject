@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useRedemptionCodes, RedemptionCode } from '../hooks/useRedemptionCodes';
+import { useRedemptionCodes } from '../hooks/useRedemptionCodes';
 
 export const RedemptionCodesPage: React.FC = () => {
   const { activeCodes, historyCodes } = useRedemptionCodes();
@@ -45,30 +45,29 @@ export const RedemptionCodesPage: React.FC = () => {
   );
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 space-y-8">
-      {/* Hero Banner (Comfy Light Green Theme) */}
+    <main className="mx-auto max-w-7xl px-3 sm:px-6 py-4 space-y-6 antialiased selection:bg-[#b23a6b] selection:text-white">
+      {/* Hero Banner (V2 Warm Gradient) */}
       <section className="codes-page-hero">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <span className="text-3xl sm:text-4xl select-none" aria-hidden="true">🎁</span>
-              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground font-sans">
+              <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#b23a6b] font-heading">
                 Redemption Codes
               </h1>
-              <span className="text-2xl select-none" title="Comfy Tulip Theme">🌷</span>
             </div>
-            <p className="mt-1.5 text-xs sm:text-sm font-semibold text-[#166534] font-sans">
+            <p className="mt-1 text-xs sm:text-sm font-semibold text-[#6b4f35] font-sans">
               Copy and redeem these free gift codes in Heartopia for stars, outfits, and special items!
             </p>
           </div>
 
           {/* Quick Stats Pill */}
           <div className="flex items-center gap-2">
-            <span className="rounded-full border-2 border-foreground bg-[#bbf7d0] px-4 py-1.5 text-xs sm:text-sm font-bold text-foreground shadow-xs">
+            <span className="rounded-full bg-[#f3ecda] px-4 py-1.5 text-xs sm:text-sm font-bold text-[#6b4f35] shadow-xs">
               ✨ {activeCodes.length} Active Codes
             </span>
             {historyCodes.length > 0 && (
-              <span className="rounded-full border-2 border-[#dc2626] bg-[#fef2f2] px-3 py-1.5 text-xs sm:text-sm font-bold text-[#dc2626] shadow-xs">
+              <span className="rounded-full bg-[#f9f4e6] px-3.5 py-1.5 text-xs sm:text-sm font-bold text-[#8c6f55] shadow-xs">
                 📜 {historyCodes.length} Expired
               </span>
             )}
@@ -76,8 +75,8 @@ export const RedemptionCodesPage: React.FC = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="mt-4 pt-4 border-t-2 border-dashed border-[#15803d]/30 flex flex-wrap items-center justify-between gap-3">
-          <div className="relative w-full sm:w-72">
+        <div className="mt-4 pt-4 border-t border-[#e9b3ad]/40 flex flex-wrap items-center justify-between gap-3">
+          <div className="relative w-full sm:w-80">
             <input
               type="text"
               autoComplete="off"
@@ -89,14 +88,14 @@ export const RedemptionCodesPage: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search code or reward..."
-              className="w-full rounded-full border-2 border-foreground bg-white px-4 py-1.5 pl-9 font-sans font-bold text-xs sm:text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-[#15803d] shadow-xs"
+              className="w-full rounded-full border border-[#e9b3ad] bg-[#f9f4e6] px-4 py-2 pl-9 font-sans font-medium text-xs sm:text-sm text-[#6b4f35] placeholder:text-[#8c6f55]/70 focus:outline-none focus:ring-2 focus:ring-[#b23a6b] shadow-xs"
             />
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm select-none">
               🔍
             </span>
           </div>
 
-          <span className="text-xs font-bold text-[#166534] font-sans">
+          <span className="text-xs font-bold text-[#6e7a3c] font-sans">
             Tip: Click any code box or copy button to copy directly!
           </span>
         </div>
@@ -107,25 +106,25 @@ export const RedemptionCodesPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-2xl select-none">✨</span>
-            <h2 className="text-2xl font-bold tracking-tight text-foreground font-sans">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#7a5638] font-serif">
               Active Codes
             </h2>
-            <span className="rounded-full border-2 border-foreground bg-[#bbf7d0] px-2.5 py-0.5 text-xs font-bold text-foreground">
+            <span className="tag-v2 shrink-0">
               {filteredActive.length}
             </span>
           </div>
         </div>
 
         {filteredActive.length === 0 ? (
-          <div className="rounded-[24px] border-2 border-dashed border-foreground/30 bg-[#f0fdf4] p-8 text-center space-y-2">
-            <p className="text-base font-bold text-foreground font-sans">
+          <div className="rounded-[24px] bg-[#f3ecda] p-8 text-center space-y-2">
+            <p className="text-base font-bold text-[#6b4f35] font-sans">
               No matching active codes found for "{searchQuery}"
             </p>
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="rounded-full border-2 border-foreground bg-[#bbf7d0] px-4 py-1 text-xs font-bold text-foreground shadow-xs hover:bg-[#86efac] transition-all cursor-pointer"
+                className="btn-v2 btn-v2-olive text-xs"
               >
                 Clear search
               </button>
@@ -140,31 +139,30 @@ export const RedemptionCodesPage: React.FC = () => {
                   {/* Top Header: Gift Icon + Status Pill */}
                   <div>
                     <div className="flex items-center justify-between gap-2">
-                      {/* Small Gift Icon inside the box */}
                       <div className="code-badge-gift" title="Gift Box">
                         <span>🎁</span>
                       </div>
 
-                      <span className="rounded-full border border-foreground/30 bg-[#dcfce7] px-2.5 py-0.5 text-[11px] font-bold font-sans text-[#166534]">
+                      <span className="tag-v2" style={{ background: '#d9e0b4', color: '#6e7a3c' }}>
                         ● Active
                       </span>
                     </div>
 
                     {/* Card Title */}
-                    <h3 className="mt-3 text-lg font-bold text-foreground font-sans tracking-tight">
+                    <h3 className="mt-3 text-lg font-bold text-[#7a5638] font-heading tracking-tight">
                       {item.title}
                     </h3>
 
                     {/* Rewards Summary */}
                     {item.rewards && (
-                      <p className="mt-1 text-xs font-medium text-foreground/80 font-sans line-clamp-2">
+                      <p className="mt-1 text-xs font-medium text-[#6b4f35] font-sans line-clamp-2">
                         🎁 {item.rewards}
                       </p>
                     )}
                   </div>
 
                   {/* Bottom: Code Pill (Copyable) + Expiry Date */}
-                  <div className="space-y-2 pt-3 border-t-2 border-dashed border-foreground/15">
+                  <div className="space-y-2 pt-3 border-t border-[#e9b3ad]/40">
                     {/* The Code Pill Box */}
                     <div
                       onClick={() => handleCopyCode(item.id, item.code)}
@@ -172,15 +170,15 @@ export const RedemptionCodesPage: React.FC = () => {
                       className="code-pill-box group"
                     >
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-xs text-muted-foreground select-none font-bold uppercase tracking-wider font-mono">
+                        <span className="text-xs text-[#8c6f55] select-none font-bold uppercase tracking-wider font-mono">
                           CODE:
                         </span>
-                        <code className="font-mono font-bold text-sm sm:text-base text-foreground tracking-wider truncate">
+                        <code className="font-mono font-bold text-sm sm:text-base text-[#6b4f35] tracking-wider truncate">
                           {item.code}
                         </code>
                       </div>
 
-                      {/* Small Copy Button */}
+                      {/* Copy Button */}
                       <button
                         type="button"
                         onClick={(e) => {
@@ -188,26 +186,24 @@ export const RedemptionCodesPage: React.FC = () => {
                           handleCopyCode(item.id, item.code);
                         }}
                         aria-label={`Copy ${item.code}`}
-                        className={`shrink-0 flex items-center gap-1 rounded-full border-1.5 border-foreground px-2.5 py-1 text-xs font-bold font-sans transition-all cursor-pointer ${
-                          isCopied
-                            ? 'bg-[#15803d] text-white shadow-xs'
-                            : 'bg-[#bbf7d0] text-foreground hover:bg-[#86efac] active:translate-y-0.5'
+                        className={`btn-v2 text-xs py-1 px-3 min-h-[32px] shrink-0 ${
+                          isCopied ? 'btn-v2-olive' : ''
                         }`}
                       >
-                        <span>{isCopied ? '✅' : '📋'}</span>
+                        <span>{isCopied ? '✨' : '📋'}</span>
                         <span>{isCopied ? 'Copied!' : 'Copy'}</span>
                       </button>
                     </div>
 
                     {/* Expiry Date under the code */}
-                    <div className="flex items-center justify-between text-[11px] font-bold font-sans text-[#166534] px-1">
+                    <div className="flex items-center justify-between text-[11px] font-bold font-sans text-[#6e7a3c] px-1">
                       <span className="flex items-center gap-1">
                         <span>⏳</span>
                         <span>Expires: {item.expiry}</span>
                       </span>
                       {isCopied && (
-                        <span className="text-[#15803d] animate-pulse">
-                          Ready to paste in-game!
+                        <span className="text-[#b23a6b] font-bold">
+                          Ready to paste! ✨
                         </span>
                       )}
                     </div>
@@ -219,19 +215,19 @@ export const RedemptionCodesPage: React.FC = () => {
         )}
       </section>
 
-      {/* 2. History Codes Section (Under the codes: pill shaped, red bordered cards, strike on the code in red) */}
-      <section className="space-y-4 pt-4 border-t-3 border-dashed border-foreground/20">
+      {/* 2. History Codes Section */}
+      <section className="space-y-4 pt-4 border-t border-[#e9b3ad]/40">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-2xl select-none">📜</span>
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-foreground font-sans flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#7a5638] font-serif flex items-center gap-2">
                 <span>History Codes</span>
-                <span className="rounded-full border-2 border-[#dc2626] bg-[#fef2f2] px-2.5 py-0.5 text-xs font-bold text-[#dc2626]">
+                <span className="tag-v2">
                   Expired ({filteredHistory.length})
                 </span>
               </h2>
-              <p className="text-xs font-medium text-muted-foreground font-sans">
+              <p className="text-xs font-medium text-[#8c6f55] font-sans">
                 Past redemption codes that have reached their expiration date.
               </p>
             </div>
@@ -239,8 +235,8 @@ export const RedemptionCodesPage: React.FC = () => {
         </div>
 
         {filteredHistory.length === 0 ? (
-          <div className="rounded-[24px] border-2 border-dashed border-[#dc2626]/40 bg-[#fef2f2]/60 p-6 text-center">
-            <p className="text-sm font-bold text-muted-foreground font-sans">
+          <div className="rounded-[24px] bg-[#f3ecda] p-6 text-center">
+            <p className="text-sm font-bold text-[#8c6f55] font-sans">
               No expired codes in history.
             </p>
           </div>
@@ -252,52 +248,19 @@ export const RedemptionCodesPage: React.FC = () => {
                 className="history-code-square"
                 title={`${item.title} - ${item.code}`}
               >
-                <h3 className="font-sans font-bold text-xs sm:text-sm text-foreground text-center line-clamp-2 leading-snug">
+                <h3 className="font-heading font-semibold text-xs sm:text-sm text-[#7a5638] text-center line-clamp-2 leading-snug">
                   {item.title}
                 </h3>
-                <span className="rounded-full bg-[#fef2f2] border border-[#dc2626]/40 px-3 py-0.5 history-code-strike text-xs font-mono font-bold text-[#b91c1c] text-center tracking-wider">
+                <span className="rounded-full bg-[#f9f4e6] px-3 py-0.5 line-through text-xs font-mono font-bold text-[#8c6f55] text-center tracking-wider">
                   {item.code}
+                </span>
+                <span className="text-[10px] text-[#8c6f55]/80 font-mono">
+                  Expired: {item.expiry}
                 </span>
               </div>
             ))}
           </div>
         )}
-      </section>
-
-      {/* 3. How to Redeem Guide */}
-      <section className="rounded-[24px] border-[3px] border-foreground bg-[#dcfce7] p-5 sm:p-6 shadow-[4px_4px_0_0_#15803d] space-y-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">💡</span>
-          <h2 className="text-lg font-bold text-foreground font-sans">
-            How to Redeem Codes in Heartopia
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-1">
-          <div className="rounded-2xl border-2 border-foreground/40 bg-white/80 p-3 shadow-xs">
-            <span className="block font-mono text-xs font-bold text-[#15803d]">STEP 1</span>
-            <p className="mt-0.5 text-xs font-bold text-foreground font-sans">
-              Open Heartopia and tap your <strong>Avatar / Settings ⚙️</strong> in the corner.
-            </p>
-          </div>
-          <div className="rounded-2xl border-2 border-foreground/40 bg-white/80 p-3 shadow-xs">
-            <span className="block font-mono text-xs font-bold text-[#15803d]">STEP 2</span>
-            <p className="mt-0.5 text-xs font-bold text-foreground font-sans">
-              Navigate to the <strong>Account</strong> or <strong>System</strong> tab.
-            </p>
-          </div>
-          <div className="rounded-2xl border-2 border-foreground/40 bg-white/80 p-3 shadow-xs">
-            <span className="block font-mono text-xs font-bold text-[#15803d]">STEP 3</span>
-            <p className="mt-0.5 text-xs font-bold text-foreground font-sans">
-              Tap <strong>Redeem Code</strong> and paste your copied gift code.
-            </p>
-          </div>
-          <div className="rounded-2xl border-2 border-foreground/40 bg-white/80 p-3 shadow-xs">
-            <span className="block font-mono text-xs font-bold text-[#15803d]">STEP 4</span>
-            <p className="mt-0.5 text-xs font-bold text-foreground font-sans">
-              Check your in-game <strong>Mailbox 📬</strong> to claim your rewards!
-            </p>
-          </div>
-        </div>
       </section>
     </main>
   );

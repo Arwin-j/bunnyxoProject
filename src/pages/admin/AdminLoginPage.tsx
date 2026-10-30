@@ -53,26 +53,31 @@ export const AdminLoginPage: React.FC = () => {
       <form
         onSubmit={handleSubmit}
         autoComplete="off"
-        className="sticker shadow-berry mt-6 w-full rounded-[32px_40px_28px_44px] p-6 sm:p-8 border-[3px] border-foreground bg-card"
+        className="card-v2 mt-6 w-full p-6 sm:p-8 space-y-4"
+        style={{
+          boxShadow: '0 8px 24px rgba(107, 79, 53, 0.08)',
+        }}
         noValidate
       >
         <div className="flex items-center justify-center gap-2">
-          <h1 className="text-center text-3xl font-semibold">Admin Login</h1>
+          <h1 className="text-center text-2xl sm:text-3xl font-heading font-bold text-[#b23a6b]">
+            Admin Login
+          </h1>
           {isSupabase && (
-            <span className="rounded-full border border-emerald-500 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+            <span className="tag-v2 text-[10px]" style={{ background: '#d9e0b4', color: '#6e7a3c' }}>
               Supabase Auth
             </span>
           )}
         </div>
-        <p className="mt-1 text-center text-sm text-muted-foreground font-mono">
-          BunnySite keepers only 🐰
+        <p className="mt-1 text-center text-xs sm:text-sm text-[#8c6f55] font-sans">
+          Bunny xo Keepers & Curators 🐰🌸
         </p>
 
-        <div className="mt-6 space-y-4">
+        <div className="space-y-4 pt-2">
           <div>
             <label
               htmlFor="admin-email"
-              className="block text-sm font-semibold font-mono text-foreground"
+              className="block text-xs font-heading font-bold uppercase tracking-wider text-[#7a5638]"
             >
               Admin Email
             </label>
@@ -89,7 +94,7 @@ export const AdminLoginPage: React.FC = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-2xl border-[3px] border-foreground bg-background px-4 py-2 text-base font-mono focus:outline-none focus:ring-2 focus:ring-primary"
+              className="mt-1 w-full rounded-2xl border border-[#e9b3ad] bg-[#f9f4e6] px-4 py-2.5 text-sm font-sans text-[#6b4f35] placeholder:text-[#8c6f55]/60 focus:outline-none focus:ring-2 focus:ring-[#b23a6b]"
               placeholder="admin@heartopia.com"
               aria-invalid={!!error}
               aria-describedby={error ? 'login-error' : undefined}
@@ -99,7 +104,7 @@ export const AdminLoginPage: React.FC = () => {
           <div>
             <label
               htmlFor="admin-password"
-              className="block text-sm font-semibold font-mono text-foreground"
+              className="block text-xs font-heading font-bold uppercase tracking-wider text-[#7a5638]"
             >
               Password
             </label>
@@ -116,7 +121,7 @@ export const AdminLoginPage: React.FC = () => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-2xl border-[3px] border-foreground bg-background px-4 py-2 text-base font-mono focus:outline-none focus:ring-2 focus:ring-primary"
+              className="mt-1 w-full rounded-2xl border border-[#e9b3ad] bg-[#f9f4e6] px-4 py-2.5 text-sm font-sans text-[#6b4f35] placeholder:text-[#8c6f55]/60 focus:outline-none focus:ring-2 focus:ring-[#b23a6b]"
               placeholder="••••••••"
               aria-invalid={!!error}
               aria-describedby={error ? 'login-error' : undefined}
@@ -127,7 +132,7 @@ export const AdminLoginPage: React.FC = () => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="sticker shadow-ink mt-6 h-auto w-full cursor-pointer rounded-full border-[3px] border-foreground bg-primary px-6 py-2.5 text-xl font-semibold hover:bg-accent active:translate-y-0.5 disabled:opacity-50 transition-all"
+          className="btn-v2 w-full text-base py-3 min-h-[44px] cursor-pointer"
         >
           {isSubmitting ? 'Opening…' : 'Hop in 🐾'}
         </button>
@@ -136,7 +141,7 @@ export const AdminLoginPage: React.FC = () => {
           <p
             id="login-error"
             role="alert"
-            className="mt-4 rounded-xl border-2 border-primary bg-primary/20 px-3 py-2 text-center text-sm font-semibold text-foreground"
+            className="mt-4 rounded-xl bg-[#fbd5e1] border border-[#b23a6b]/30 px-3 py-2 text-center text-xs font-bold text-[#b23a6b]"
           >
             ⚠️ {error}
           </p>

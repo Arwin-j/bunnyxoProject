@@ -1,62 +1,95 @@
 import React from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { BunnyLogo } from './BunnyLogo';
+import { useAuth } from '../../hooks/useAuth';
 
 const NAV_LINKS = [
-  { to: '/events', emoji: '🎟️', label: 'Events' },
-  { to: '/map', emoji: '🗺️', label: 'Map' },
-  { to: '/feed', emoji: '📰', label: 'Feed' },
-  { to: '/updates', emoji: '📣', label: 'Updates' },
+  { to: '/home', label: 'Home' },
+  { to: '/events', label: 'Events' },
+  { to: '/map', label: 'Map' },
+  { to: '/codes', label: 'Codes' },
+  { to: '/feed', label: 'Feed' },
+  { to: '/updates', label: 'Updates' },
 ];
 
 export const Header: React.FC = () => {
   const location = useLocation();
+  const { currentUser, isAuthenticated, signOut } = useAuth();
+
   const isCodesActive =
     location.pathname.startsWith('/codes') ||
     location.pathname.startsWith('/redemption-codes');
 
+  const username = currentUser?.email
+    ? currentUser.email.split('@')[0]
+    : 'Bunny Friend';
+
   return (
-    <header className="sticky top-0 z-20 flex items-center gap-2 border-b-[3px] border-dashed border-primary bg-background px-3 py-2 sm:px-4">
-      <Link to="/home" aria-label="Home" className="shrink-0 flex items-center gap-2">
-        <BunnyLogo className="bob h-5 sm:h-6 w-auto shrink-0 select-none object-contain" />
-      </Link>
-      <Link to="/home" className="shrink-0 text-lg font-semibold sm:text-2xl hover:opacity-90">
-        Bunny Hub
-      </Link>
+    <header className="sticky top-2 z-30 px-3 sm:px-6 pt-2 pb-1 max-w-7xl mx-auto w-full">
+      <nav className="flex items-center gap-2 sm:gap-3 flex-wrap bg-[#a9ad73] rounded-[26px] p-2 sm:px-4 sm:py-2.5 shadow-sm">
+        {/* Circular Dashed Logo */}
+        <Link
+          to="/home"
+          aria-label="Bunny xo Home"
+          title="Bunny xo"
+          className="size-11 sm:size-13 rounded-full bg-[#fbd5e1] border-[3px] border-dashed border-white flex items-center justify-center font-heading font-bold text-[#b23a6b] text-xs sm:text-sm shrink-0 hover:scale-105 transition-transform"
+        >
+          <BunnyLogo className="h-6 sm:h-7 w-auto object-contain select-none" />
+        </Link>
 
-      {/* Codes Button next to Bunny Hub */}
-      <NavLink
-        to="/codes"
-        title="Redemption Codes"
-        aria-label="Redemption Codes"
-        className={({ isActive }) => {
-          const active = isActive || isCodesActive;
-          return `nav-codes-btn ${active ? 'nav-codes-btn-active' : 'nav-codes-btn-inactive'}`;
-        }}
-      >
-        <span className="text-sm select-none" aria-hidden="true">🎁</span>
-        <span className="nav-codes-text">Codes</span>
-      </NavLink>
+        {/* Navigation Pills */}
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap overflow-x-auto no-scrollbar py-0.5">
+          {NAV_LINKS.map((link) => {
+            const isHome = link.to === '/home';
+            const isActive =
+              isHome
+                ? location.pathname === '/home' || location.pathname === '/'
+                : link.to === '/codes'
+                ? isCodesActive
+                : location.pathname.startsWith(link.to);
 
-      <nav className="no-scrollbar ml-auto sm:ml-2 flex min-w-0 gap-1 overflow-x-auto py-1">
-        {NAV_LINKS.map((link) => (
-          <NavLink
-            key={link.to}
-            to={link.to}
-            aria-label={link.label}
-            title={link.label}
-            className={({ isActive }) =>
-              `flex shrink-0 items-center gap-1 rounded-full border-[3px] px-2.5 py-0.5 text-base sm:text-lg transition-transform active:translate-y-0.5 ${
-                isActive
-                  ? '!border-foreground bg-primary shadow-ink font-semibold'
-                  : 'border-transparent hover:bg-accent font-medium'
-              }`
-            }
-          >
-            <span aria-hidden="true">{link.emoji}</span>
-            <span className="hidden text-sm md:inline sm:text-base">{link.label}</span>
-          </NavLink>
-        ))}
+            return (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={`rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2 font-heading font-semibold text-sm sm:text-base transition-all select-none active:translate-y-0.5 ${
+                  isActive
+                    ? 'bg-[#b23a6b] text-white shadow-xs'
+                    : 'bg-[#f3ecda] text-[#b23a6b] hover:bg-white/90'
+                }`}
+              >
+                {link.label}
+              </NavLink>
+            );
+          })}
+        </div>
+
+        {/* Spacer */}
+        <div className="flex-1 min-w-0" />
+
+        {/* Right: User / Admin Pill */}
+        <div className="bg-[#f3ecda] rounded-full py-1.5 px-3.5 sm:px-4 flex items-center gap-2 sm:gap-2.5 text-xs sm:text-sm font-sans font-medium text-[#6b4f35] shrink-0">
+          <div className="size-7 sm:size-8 rounded-full bg-[#f6c9b8] flex items-center justify-center font-heading font-bold text-[#b23a6b] text-xs">
+            🐾
+          </div>
+          <span className="truncate max-w-[120px] sm:max-w-[160px]">
+            <strong className="text-[#6b4f35]">{username}</strong>
+            {' · '}
+            {isAuthenticated ? (
+              <button
+                type="button"
+                onClick={() => signOut()}
+                className="text-[#b23a6b] font-bold hover:underline cursor-pointer"
+              >
+                Log out
+              </button>
+            ) : (
+              <Link to="/admin" className="text-[#b23a6b] font-bold hover:underline">
+                Admin
+              </Link>
+            )}
+          </span>
+        </div>
       </nav>
     </header>
   );

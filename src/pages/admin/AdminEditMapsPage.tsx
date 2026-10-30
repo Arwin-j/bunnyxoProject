@@ -5,7 +5,9 @@ import islandMapUrl from '../../assets/heartopia-island-map.jpg';
 import { AdminEditTabs } from '../../components/admin/AdminEditTabs';
 import { Toast, ToastMessage } from '../../components/admin/Toast';
 import { ConfirmModal } from '../../components/admin/ConfirmModal';
+import { AddCategoryModal } from '../../components/admin/AddCategoryModal';
 import { useInteractivePins } from '../../hooks/useInteractivePins';
+import { useMapCategories } from '../../hooks/useMapCategories';
 import {
   GameId,
   HeartopiaMapId,
@@ -47,6 +49,10 @@ export const AdminEditMapsPage: React.FC = () => {
   const [selectedMap, setSelectedMap] = useState<HeartopiaMapId>('island');
   const [isMapDropdownOpen, setIsMapDropdownOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Dynamic Categories Hook
+  const { categories, addCategory } = useMapCategories();
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState<boolean>(false);
 
   // Edit Mode ("Adjust Pins" toggle)
   const [adjustPinsMode, setAdjustPinsMode] = useState<boolean>(false);
@@ -109,13 +115,14 @@ export const AdminEditMapsPage: React.FC = () => {
     isEditable: boolean,
     isDraft: boolean = false
   ) => {
-    const cat = PIN_CATEGORIES[catKey] || PIN_CATEGORIES.landmark;
-    const baseSize = cat.size || 26;
+    const cat = categories[catKey] || categories.landmark || Object.values(categories)[0];
+    const baseSize = cat?.size || 26;
     const opacity = isDraft ? 0.9 : owned ? 0.6 : 1;
-    const hasImage = Boolean(image);
+    const effectiveImage = image || cat?.image || null;
+    const hasImage = Boolean(effectiveImage);
 
     const imageStyle = hasImage
-      ? `background-image:url('${image}');background-size:cover;background-position:center;border-color:#4a2835;`
+      ? `background-image:url('${effectiveImage}');background-size:cover;background-position:center;border-color:#4a2835;`
       : '';
 
     const draftAnimation = isDraft ? 'animation: bounce 1.2s infinite;' : '';
@@ -123,8 +130,8 @@ export const AdminEditMapsPage: React.FC = () => {
     return L.divIcon({
       className: 'interactive-pin-container',
       html: `
-        <div class="interactive-pin ${isEditable ? 'editable' : ''}" style="width:${baseSize}px;height:${baseSize}px;background-color:${cat.color};opacity:${opacity};${imageStyle};${draftAnimation}">
-          <span>${hasImage ? '' : cat.icon}</span>
+        <div class="interactive-pin ${isEditable ? 'editable' : ''}" style="width:${baseSize}px;height:${baseSize}px;background-color:${cat?.color || '#c3a468'};opacity:${opacity};${imageStyle};${draftAnimation}">
+          <span>${hasImage ? '' : cat?.icon || '★'}</span>
         </div>
       `,
       iconSize: [baseSize, baseSize],
@@ -135,9 +142,10 @@ export const AdminEditMapsPage: React.FC = () => {
 
   // Build Leaflet Popup HTML
   const buildPopupHtml = (pin: InteractivePin) => {
-    const cat = PIN_CATEGORIES[pin.cat] || PIN_CATEGORIES.landmark;
-    const imgHtml = pin.image
-      ? `<img src="${pin.image}" alt="${escapeHtml(pin.name)}" style="width:100%;max-width:220px;max-height:140px;object-fit:cover;border-radius:12px;border:2px solid #4a2835;display:block;margin-bottom:8px;box-shadow:2px 2px 0px #4a2835;" />`
+    const cat = categories[pin.cat] || categories.landmark || Object.values(categories)[0];
+    const effectiveImg = pin.image || cat?.image || null;
+    const imgHtml = effectiveImg
+      ? `<img src="${effectiveImg}" alt="${escapeHtml(pin.name)}" style="width:100%;max-width:220px;max-height:140px;object-fit:cover;border-radius:12px;border:2px solid #4a2835;display:block;margin-bottom:8px;box-shadow:2px 2px 0px #4a2835;" />`
       : '';
 
     const tagsHtml =
@@ -419,7 +427,7 @@ export const AdminEditMapsPage: React.FC = () => {
         marker.setPopupContent(buildPopupHtml(pin));
       }
     });
-  }, [pins, mapReady, adjustPinsMode, searchQuery, updatePin]);
+  }, [pins, mapReady, adjustPinsMode, searchQuery, updatePin, categories]);
 
   // Sync Draft Marker while adding a new pin
   useEffect(() => {
@@ -650,7 +658,7 @@ export const AdminEditMapsPage: React.FC = () => {
 
       const savedAt = Date.now();
       const dataJson = JSON.stringify({
-        categories: PIN_CATEGORIES,
+        categories,
         places: pins.map((p) => ({
           id: p.id,
           name: p.name,
@@ -759,7 +767,7 @@ export const AdminEditMapsPage: React.FC = () => {
       <AdminEditTabs currentTab="maps" />
 
       {/* 2. Top "Map Navigation bar" (Matching diagram title & site layout) */}
-      <div className="mb-6 rounded-[24px] border-[2.5px] border-foreground bg-card p-3 sm:p-4 shadow-ink flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-4 rounded-[24px] border-[2.5px] border-foreground bg-card p-3 shadow-ink flex flex-wrap items-center justify-between gap-3">
         {/* Left: Game Selector */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-sans font-bold uppercase tracking-wider text-muted-foreground mr-1 select-none">
@@ -792,6 +800,41 @@ export const AdminEditMapsPage: React.FC = () => {
             );
           })}
         </div>
+
+        {/* Center: Search & Reset Bar directly inside Navigation bar */}
+        {selectedGame === 'heartopia' && selectedMap === 'island' && (
+          <div className="flex items-center gap-2 flex-1 min-w-[200px] max-w-sm">
+            <div className="relative flex-1">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs select-none">🔍</span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Filter pins on map…"
+                className="w-full rounded-full border border-foreground/30 bg-background pl-8 pr-7 py-1 font-sans text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary shadow-xs"
+                autoComplete="off"
+                spellCheck={false}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 size-4 rounded-full bg-accent text-[10px] font-bold text-muted-foreground hover:text-foreground flex items-center justify-center cursor-pointer"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={handleResetView}
+              title="Reset View"
+              className="shrink-0 rounded-full border border-foreground/40 bg-background hover:bg-accent px-2.5 py-1 font-sans text-[11px] font-bold text-foreground shadow-xs active:translate-y-0.5 transition-all cursor-pointer select-none"
+            >
+              Reset
+            </button>
+          </div>
+        )}
 
         {/* Right: Map Dropdown (for Heartopia) */}
         {selectedGame === 'heartopia' && (
@@ -866,41 +909,8 @@ export const AdminEditMapsPage: React.FC = () => {
       {selectedGame === 'heartopia' && selectedMap === 'island' ? (
         <div className="heartopia-map-layout">
           {/* Left: Boxed Map Container & Controls */}
-          <section className="heartopia-map-main flex flex-col gap-4">
-            {/* Quick Search & Reset Bar */}
-            <div className="flex items-center justify-between gap-2 rounded-[20px] border-2 border-foreground bg-card p-2 shadow-xs">
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <span className="text-sm select-none pl-1">🔍</span>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Filter pins on map…"
-                  className="w-full rounded-full border border-foreground/30 bg-background px-3 py-1 font-sans text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary"
-                  autoComplete="off"
-                  spellCheck={false}
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="size-5 shrink-0 rounded-full bg-accent text-[11px] font-bold text-muted-foreground hover:text-foreground flex items-center justify-center cursor-pointer"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={handleResetView}
-                title="Reset View"
-                className="shrink-0 rounded-full border border-foreground bg-background hover:bg-accent px-3 py-1 font-sans text-xs font-bold text-foreground shadow-xs active:translate-y-0.5 transition-all cursor-pointer select-none"
-              >
-                Reset View
-              </button>
-            </div>
-
-            {/* MAP BOX (Compact height for more space) */}
+          <section className="heartopia-map-main flex flex-col gap-3">
+            {/* MAP BOX is right at the top of everything! */}
             <div
               className="heartopia-canvas-wrapper relative w-full overflow-hidden"
               style={{ height: '480px', minHeight: '400px' }}
@@ -1153,7 +1163,7 @@ export const AdminEditMapsPage: React.FC = () => {
                         <option value="">(Pick existing pin to edit...)</option>
                         {pins.map((p) => (
                           <option key={p.id} value={p.id}>
-                            {p.name} ({PIN_CATEGORIES[p.cat]?.label || p.cat})
+                            {p.name} ({categories[p.cat]?.label || p.cat})
                           </option>
                         ))}
                       </select>
@@ -1210,28 +1220,38 @@ export const AdminEditMapsPage: React.FC = () => {
                           />
                         </div>
 
-                        {/* Field 2: Category */}
+                        {/* Field 2: Category with + Button */}
                         <div>
                           <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
                             Category
                           </label>
-                          <select
-                            value={activePin.cat}
-                            onChange={(e) =>
-                              setEditingPin((prev) =>
-                                prev
-                                  ? { ...prev, cat: e.target.value }
-                                  : { ...activePin, cat: e.target.value }
-                              )
-                            }
-                            className="w-full rounded-2xl border-2 border-foreground bg-[#FFF9F2] px-3.5 py-2 text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-                          >
-                            {Object.entries(PIN_CATEGORIES).map(([catKey, cat]) => (
-                              <option key={catKey} value={catKey}>
-                                {cat.icon} {cat.label}
-                              </option>
-                            ))}
-                          </select>
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={activePin.cat}
+                              onChange={(e) =>
+                                setEditingPin((prev) =>
+                                  prev
+                                    ? { ...prev, cat: e.target.value }
+                                    : { ...activePin, cat: e.target.value }
+                                )
+                              }
+                              className="flex-1 rounded-2xl border-2 border-foreground bg-[#FFF9F2] px-3.5 py-2 text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+                            >
+                              {Object.entries(categories).map(([catKey, cat]) => (
+                                <option key={catKey} value={catKey}>
+                                  {cat.icon ? cat.icon + ' ' : ''}{cat.label}
+                                </option>
+                              ))}
+                            </select>
+                            <button
+                              type="button"
+                              onClick={() => setIsAddCategoryOpen(true)}
+                              title="Add new category"
+                              className="size-10 shrink-0 rounded-2xl border-2 border-foreground bg-primary hover:bg-accent font-mono text-xl font-black text-foreground shadow-xs active:translate-y-0.5 transition-all flex items-center justify-center cursor-pointer select-none"
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
 
                         {/* Field 3: Subcategory (optional) */}
@@ -1570,6 +1590,36 @@ export const AdminEditMapsPage: React.FC = () => {
           setEditingPin(null);
         }}
         onCancel={() => setIsResetConfirmOpen(false)}
+      />
+
+      {/* Draggable Add Category Modal Window */}
+      <AddCategoryModal
+        isOpen={isAddCategoryOpen}
+        onClose={() => setIsAddCategoryOpen(false)}
+        onSave={(newCatData) => {
+          const created = addCategory(newCatData);
+          setEditingPin((prev) =>
+            prev
+              ? { ...prev, cat: created.id }
+              : {
+                  name: 'New Pin',
+                  cat: created.id,
+                  subcat: '',
+                  owned: false,
+                  tags: [],
+                  desc: '',
+                  image: null,
+                  x: Math.round(MAP_SIZE / 2),
+                  y: Math.round(MAP_SIZE / 2),
+                  isNew: true,
+                }
+          );
+          setToast({
+            id: String(Date.now()),
+            type: 'success',
+            text: `Added new category "${created.label}"!`,
+          });
+        }}
       />
 
       {/* Toast Notification */}

@@ -58,7 +58,11 @@ export const App: React.FC = () => {
       />
       <Route
         path="/admin/overview"
-        element={<Navigate to="/admin" replace />}
+        element={
+          <AdminLayout>
+            <AdminOverviewPage />
+          </AdminLayout>
+        }
       />
       <Route
         path="/admin/edit"
@@ -70,7 +74,11 @@ export const App: React.FC = () => {
       />
       <Route
         path="/admin/edit/events"
-        element={<Navigate to="/admin/edit" replace />}
+        element={
+          <AdminLayout>
+            <AdminEditPage />
+          </AdminLayout>
+        }
       />
       <Route
         path="/admin/edit/codes"

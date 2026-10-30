@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+  <!-- Retro ink shadow -->
+  <g transform="translate(1.5, 1.5)" opacity="0.28" fill="#4a2835">
+    <path d="M5.5 14C3.8 14 2.5 15.3 2.5 17C2.5 18.5 3.5 19.8 5 20.2V24C5 26.2 6.8 28 9 28H18C20.2 28 22 26.2 22 24V14.5C22 13.1 20.9 12 19.5 12C18.8 12 18.2 12.3 17.8 12.8C17.4 11.2 15.9 10 14.2 10C13.7 10 13.2 10.1 12.8 10.4C12.4 8.4 10.7 7 8.5 7C6.6 7 5 8.6 5 10.5V14.2C5.2 14.1 5.3 14 5.5 14Z"/>
+  </g>
+
+  <!-- Open Paw / Hand Outline -->
+  <path d="M5.5 14.5C4 14.5 2.8 15.7 2.8 17.2C2.8 18.6 3.8 19.7 5.2 20V24C5.2 26 6.8 27.8 8.8 27.8H17.8C19.8 27.8 21.5 26 21.5 24V15C21.5 13.6 20.4 12.5 19 12.5C18.3 12.5 17.8 12.8 17.4 13.3C17 11.8 15.6 10.6 14 10.6C13.5 10.6 13 10.8 12.6 11C12.1 9.2 10.5 8 8.5 8C6.6 8 5 9.6 5 11.5V14.6C5.2 14.5 5.3 14.5 5.5 14.5Z" 
+        fill="#FFFDF7" stroke="#4a2835" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- Finger separation creases -->
+  <path d="M8.5 14V19" stroke="#4a2835" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M12.6 15V19.5" stroke="#4a2835" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M17 16.5V20" stroke="#4a2835" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Pink Finger Paw Pads -->
+  <circle cx="8.5" cy="10.8" r="1.5" fill="#f48fb1"/>
+  <circle cx="14" cy="13.2" r="1.5" fill="#f48fb1"/>
+  <circle cx="19" cy="15.2" r="1.4" fill="#f48fb1"/>
+  <circle cx="4.2" cy="17" r="1.3" fill="#f48fb1"/>
+
+  <!-- Center Palm Heart Pad -->
+  <path d="M11 21.8C10.2 20.5 11.4 19.2 12.6 20.1C13.8 19.2 15 20.5 14.2 21.8L12.6 23.5Z" 
+        fill="#f48fb1" stroke="#4a2835" stroke-width="1.1" stroke-linejoin="round"/>
+</svg>

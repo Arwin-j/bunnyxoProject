@@ -20,3 +20,6 @@ pnpm-debug.log*
 
 # Vite cache
 .vite/
+
+# Temporary reference designs
+design-v2-ref/

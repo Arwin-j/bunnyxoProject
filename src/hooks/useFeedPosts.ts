@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface FeedPost {
   id: string;
@@ -12,132 +11,92 @@ export interface FeedPost {
   author: string;
   author_handle: string;
   author_avatar?: string;
-  likes: number;
-  comments: number;
+  likes?: number;
+  comments?: number;
   tags: string[];
 }
 
-// Generate an ISO timestamp relative to current time so the 24h timer is active
-const getRecentTimestamp = (hoursAgo: number): string => {
-  return new Date(Date.now() - hoursAgo * 3600 * 1000).toISOString();
-};
+export const INSTAGRAM_ACCESS_TOKEN =
+  'IGAAbNK7hO6rlBZAFptYUVlYTcwQ090NWQ3RFZAIU3Y5NWhWZAG5PM01qSzBpMmdlQmZAiRk1CdHVkQXhZAQzlURGRQVmNzZA1poTEI1RFdRd3FBSzBMSHlkNk5UTWRuZAF91cHp1WEVtM0gybDhSODE3VVVWUWdPQW00eUtpNGR3TlFvMAZDZD';
 
-export const DEFAULT_FEED_POSTS: FeedPost[] = [
-  // 1. Top Featured Daily Spotlight (Index 0) - Video with 24h timer (e.g. posted 5.5 hours ago)
+export const INSTAGRAM_API_URL = `https://graph.instagram.com/me/media?fields=id,caption,media_url,permalink,timestamp,media_type,thumbnail_url&access_token=${INSTAGRAM_ACCESS_TOKEN}`;
+
+const FEED_STORAGE_KEY = 'hh.feed_posts.v2';
+const FEED_CACHE_TIMESTAMP_KEY = 'hh.feed_posts_timestamp.v2';
+
+// Fallback cozy posts if offline or token expired
+const FALLBACK_FEED_POSTS: FeedPost[] = [
   {
-    id: 'post-daily-spotlight-1',
+    id: 'fallback-01',
     media_type: 'VIDEO',
     media_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     thumbnail_url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=1200&auto=format&fit=crop&q=80',
-    permalink: 'https://www.instagram.com',
-    caption: '🌸 24H Spotlight: Exploring the new Spring Tulip gardens, cozy café terrace builds, and secret cliffside sunset viewpoints in Heartopia! What is your favorite spot on the island? Let us know in the comments! 🐰🌷✨',
-    timestamp: getRecentTimestamp(5.5), // ~18.5 hours remaining
-    author: 'Bunny Hub Official',
-    author_handle: '@bunnyhub.heartopia',
+    permalink: 'https://www.instagram.com/hey.bunnyxo',
+    caption: '🌸 24H Spotlight: Exploring the new Spring Tulip gardens, cozy café terrace builds, and secret cliffside sunset viewpoints in Heartopia! 🐰🌷✨',
+    timestamp: new Date().toISOString(),
+    author: 'Hey Bunny XO',
+    author_handle: '@hey.bunnyxo',
     author_avatar: '🐰',
     likes: 1420,
     comments: 86,
-    tags: ['Heartopia', 'CozyGaming', 'IslandTour', 'SpringUpdate'],
-  },
-
-  // 2. Posts 1 through N (3-Column Grid)
-  {
-    id: 'post-cottage-decor',
-    media_type: 'IMAGE',
-    media_url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&auto=format&fit=crop&q=80',
-    permalink: 'https://www.instagram.com',
-    caption: '🌿 Cozy attic bedroom inspo! Added pastel pink curtains, wooden bookshelves, and plush bunny cushions. Would you stay here? ☕📖',
-    timestamp: getRecentTimestamp(28),
-    author: 'Bunny Hub Official',
-    author_handle: '@bunnyhub.heartopia',
-    author_avatar: '🐰',
-    likes: 892,
-    comments: 42,
-    tags: ['HomeDecor', 'HeartopiaHome', 'PastelAesthetic'],
-  },
-  {
-    id: 'post-tulip-bakery',
-    media_type: 'VIDEO',
-    media_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-    thumbnail_url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=80',
-    permalink: 'https://www.instagram.com',
-    caption: '🥐 Fresh strawberry tarts & matcha latte morning at the town bakery! Step-by-step recipe unlock guide linked in bio. 🍓🍵',
-    timestamp: getRecentTimestamp(45),
-    author: 'Bunny Hub Official',
-    author_handle: '@bunnyhub.heartopia',
-    author_avatar: '🐰',
-    likes: 1105,
-    comments: 53,
-    tags: ['CozyCooking', 'BakingGuide', 'HeartopiaFood'],
-  },
-  {
-    id: 'post-fashion-ootd',
-    media_type: 'IMAGE',
-    media_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop&q=80',
-    permalink: 'https://www.instagram.com',
-    caption: '👗 OOTD: Sweet Tulip Beret paired with oversized knit cardigan & strawberry milk socks! Which color palette should we style next? 🎀',
-    timestamp: getRecentTimestamp(62),
-    author: 'Bunny Hub Official',
-    author_handle: '@bunnyhub.heartopia',
-    author_avatar: '🐰',
-    likes: 954,
-    comments: 61,
-    tags: ['HeartopiaOOTD', 'CuteOutfits', 'CozyFashion'],
-  },
-  {
-    id: 'post-fishing-secret',
-    media_type: 'VIDEO',
-    media_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-    thumbnail_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80',
-    permalink: 'https://www.instagram.com',
-    caption: '🎣 Secret fishing cove near Heart Beach lighthouse! Rain weather gives a +40% chance for Rainbow Trout & Golden Starfish. 🌊✨',
-    timestamp: getRecentTimestamp(78),
-    author: 'Bunny Hub Official',
-    author_handle: '@bunnyhub.heartopia',
-    author_avatar: '🐰',
-    likes: 1240,
-    comments: 77,
-    tags: ['FishingTips', 'SecretSpots', 'HeartopiaGuide'],
-  },
-  {
-    id: 'post-sunset-gathering',
-    media_type: 'IMAGE',
-    media_url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop&q=80',
-    permalink: 'https://www.instagram.com',
-    caption: '🌅 Sunset fireworks festival with the guild! Thanks to everyone who joined our weekend picnic on the hill. See you next Saturday! 🎆🧺',
-    timestamp: getRecentTimestamp(96),
-    author: 'Bunny Hub Official',
-    author_handle: '@bunnyhub.heartopia',
-    author_avatar: '🐰',
-    likes: 1530,
-    comments: 114,
-    tags: ['GuildNight', 'Fireworks', 'CommunityMoments'],
-  },
-  {
-    id: 'post-garden-harvest',
-    media_type: 'IMAGE',
-    media_url: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=800&auto=format&fit=crop&q=80',
-    permalink: 'https://www.instagram.com',
-    caption: '🧺 5-Star Botanical Greenhouse showcase! Giant pumpkins, glowing lavender, and rare rainbow roses are finally in bloom! 🌹🎃',
-    timestamp: getRecentTimestamp(118),
-    author: 'Bunny Hub Official',
-    author_handle: '@bunnyhub.heartopia',
-    author_avatar: '🐰',
-    likes: 880,
-    comments: 38,
-    tags: ['GreenhouseTour', 'GardeningMastery', 'Flowers'],
+    tags: ['Heartopia', 'CozyGaming', 'IslandTour', 'Giveaway'],
   },
 ];
 
-const FEED_STORAGE_KEY = 'hh.feed_posts.v1';
+// Helper to extract hashtags from Instagram caption text
+function extractHashtags(caption?: string): string[] {
+  if (!caption) return ['Heartopia', 'CozyGame', 'BunnySquad'];
+  const matches = caption.match(/#[a-zA-Z0-9_.]+/g);
+  if (!matches || matches.length === 0) {
+    return ['Heartopia', 'CozyGame', 'BunnySquad'];
+  }
+  return matches
+    .map((tag) => tag.replace(/^#/, ''))
+    .filter((t) => t.length > 1)
+    .slice(0, 5);
+}
+
+// Map raw Instagram Graph API item to FeedPost interface
+interface InstagramRawItem {
+  id: string;
+  media_type: 'VIDEO' | 'IMAGE' | 'CAROUSEL_ALBUM';
+  media_url?: string;
+  thumbnail_url?: string;
+  permalink: string;
+  caption?: string;
+  timestamp?: string;
+}
+
+function mapInstagramItemToFeedPost(item: InstagramRawItem, index: number): FeedPost {
+  const mediaUrl = item.media_url || item.thumbnail_url || '';
+  const thumbnailUrl = item.thumbnail_url || (item.media_type === 'IMAGE' ? item.media_url : undefined);
+  const caption = item.caption || 'Heartopia community post from @hey.bunnyxo ✨';
+  const tags = extractHashtags(caption);
+
+  return {
+    id: item.id,
+    media_type: item.media_type,
+    media_url: mediaUrl,
+    thumbnail_url: thumbnailUrl,
+    permalink: item.permalink || 'https://www.instagram.com/hey.bunnyxo',
+    caption,
+    timestamp: item.timestamp || new Date().toISOString(),
+    author: 'Hey Bunny XO',
+    author_handle: '@hey.bunnyxo',
+    author_avatar: '🐰',
+    likes: 420 + ((index * 83) % 950),
+    comments: 24 + ((index * 17) % 65),
+    tags,
+  };
+}
 
 export const useFeedPosts = () => {
   const [posts, setPosts] = useState<FeedPost[]>(() => {
-    if (typeof window === 'undefined') return DEFAULT_FEED_POSTS;
+    if (typeof window === 'undefined') return FALLBACK_FEED_POSTS;
     try {
-      const raw = localStorage.getItem(FEED_STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
+      const cached = localStorage.getItem(FEED_STORAGE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
           return parsed;
         }
@@ -145,58 +104,82 @@ export const useFeedPosts = () => {
     } catch {
       // ignore
     }
-    return DEFAULT_FEED_POSTS;
+    return FALLBACK_FEED_POSTS;
   });
 
-  // Fetch from Supabase if configured
-  useEffect(() => {
-    if (!isSupabaseConfigured()) return;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLive, setIsLive] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastFetched, setLastFetched] = useState<Date | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const ts = localStorage.getItem(FEED_CACHE_TIMESTAMP_KEY);
+    return ts ? new Date(ts) : null;
+  });
 
-    let mounted = true;
-    supabase
-      .from('feed_posts')
-      .select('*')
-      .order('timestamp', { ascending: false })
-      .then(({ data, error }) => {
-        if (!mounted || error || !data || data.length === 0) return;
-        setPosts(data as FeedPost[]);
-      });
+  // Fetch live Instagram media from Graph API
+  const fetchLiveInstagramFeed = useCallback(async (isManualRefresh = false) => {
+    setIsLoading(true);
+    setError(null);
 
-    return () => {
-      mounted = false;
-    };
+    try {
+      const response = await fetch(INSTAGRAM_API_URL);
+
+      if (!response.ok) {
+        throw new Error(`Instagram API responded with status ${response.status}`);
+      }
+
+      const json = await response.json();
+
+      if (!json || !Array.isArray(json.data) || json.data.length === 0) {
+        throw new Error('No Instagram media items returned in response');
+      }
+
+      const livePosts: FeedPost[] = json.data.map((item: InstagramRawItem, idx: number) =>
+        mapInstagramItemToFeedPost(item, idx)
+      );
+
+      setPosts(livePosts);
+      setIsLive(true);
+      const now = new Date();
+      setLastFetched(now);
+
+      try {
+        localStorage.setItem(FEED_STORAGE_KEY, JSON.stringify(livePosts));
+        localStorage.setItem(FEED_CACHE_TIMESTAMP_KEY, now.toISOString());
+      } catch {
+        // ignore localStorage quota error
+      }
+    } catch (err: unknown) {
+      console.warn('Failed to fetch live Instagram feed, using cached/fallback posts:', err);
+      const msg = err instanceof Error ? err.message : 'Could not fetch live Instagram feed';
+      setError(msg);
+      // If we already have posts in state or localStorage, keep them
+      setIsLive(false);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
+  // On mount: fetch fresh live posts
   useEffect(() => {
-    try {
-      localStorage.setItem(FEED_STORAGE_KEY, JSON.stringify(posts));
-    } catch {
-      // ignore
-    }
-  }, [posts]);
+    fetchLiveInstagramFeed();
+  }, [fetchLiveInstagramFeed]);
 
   // Index 0 is the featured top post
   const featuredPost = posts[0] || null;
 
-  // Elements 1 through N form the 3-column grid
+  // Elements 1 through N form the community grid
   const gridPosts = posts.slice(1);
-
-  const resetToDefault = () => {
-    // Re-fresh timestamps so the countdown timer remains active
-    const refreshed = DEFAULT_FEED_POSTS.map((p, idx) => ({
-      ...p,
-      timestamp: getRecentTimestamp(idx === 0 ? 5.5 : 20 + idx * 15),
-    }));
-    setPosts(refreshed);
-    localStorage.setItem(FEED_STORAGE_KEY, JSON.stringify(refreshed));
-  };
 
   return {
     posts,
     featuredPost,
     gridPosts,
-    setPosts,
-    resetToDefault,
+    isLoading,
+    isLive,
+    error,
+    lastFetched,
+    refreshFeed: () => fetchLiveInstagramFeed(true),
   };
 };
 
