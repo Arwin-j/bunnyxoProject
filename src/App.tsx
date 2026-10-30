@@ -15,9 +15,11 @@ import { AdminEditPage } from './pages/admin/AdminEditPage';
 import { AdminEditCodesPage } from './pages/admin/AdminEditCodesPage';
 import { AdminEditMapsPage } from './pages/admin/AdminEditMapsPage';
 import { AuthProvider } from './hooks/useAuth';
+import { GameProvider } from './hooks/useGame';
+
 const PublicLayout: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-foreground">
+    <div style={{ background: '#f3d2cb', minHeight: '100vh', color: '#6b4f35', fontFamily: 'Nunito, sans-serif' }}>
       <Header />
       <Outlet />
     </div>
@@ -27,7 +29,8 @@ const PublicLayout: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <AuthProvider>
-      <Routes>
+      <GameProvider>
+        <Routes>
       {/* Welcome Screen */}
       <Route path="/" element={<WelcomePage />} />
 
@@ -35,10 +38,13 @@ export const App: React.FC = () => {
       <Route element={<PublicLayout />}>
         <Route path="/home" element={<HomePage />} />
         <Route path="/events" element={<EventsPage />} />
+        <Route path="/collection" element={<Navigate to="/events" replace />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/feed" element={<FeedPage />} />
+        <Route path="/about" element={<Navigate to="/feed" replace />} />
         <Route path="/guides" element={<Navigate to="/feed" replace />} />
         <Route path="/updates" element={<UpdatesPage />} />
+        <Route path="/games" element={<Navigate to="/updates" replace />} />
         <Route path="/codes" element={<RedemptionCodesPage />} />
         <Route path="/redemption-codes" element={<Navigate to="/codes" replace />} />
       </Route>
@@ -100,6 +106,7 @@ export const App: React.FC = () => {
       {/* Catch-all Fallback */}
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
+      </GameProvider>
   </AuthProvider>
   );
 };
