@@ -362,7 +362,7 @@ function main() {
 
   // Interactive watch mode bypasses JSON report generation
   if (options.watch) {
-    const watchArgs = [...activeTargets];
+    const watchArgs = ['watch', ...activeTargets];
     if (options.filter) watchArgs.push(options.filter);
     if (options.coverage) watchArgs.push('--coverage');
     if (options.bail) watchArgs.push('--bail', '1');
@@ -377,8 +377,12 @@ function main() {
     setupSignalHandlers(child, () => {});
 
     child.on('close', (code, signal) => {
-      if (signal) process.kill(process.pid, signal);
-      else process.exit(code ?? 1);
+      if (signal) {
+        process.removeAllListeners(signal);
+        process.kill(process.pid, signal);
+      } else {
+        process.exit(code ?? 1);
+      }
     });
     return;
   }
@@ -430,7 +434,13 @@ function main() {
 
   setupSignalHandlers(child, cleanupReport);
 
-  child.on('close', (exitCode) => {
+  child.on('close', (exitCode, signal) => {
+    if (signal) {
+      cleanupReport();
+      process.removeAllListeners(signal);
+      process.kill(process.pid, signal);
+      return;
+    }
     try {
       let reportData = null;
       if (fs.existsSync(reportFile)) {

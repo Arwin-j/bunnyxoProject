@@ -13,6 +13,8 @@ import { render, screen, renderHook, act } from '@testing-library/react';
 // Verify path alias (@/)
 import { cn } from '@/utils/cn';
 import { GameProvider, useGame } from '@/hooks/useGame';
+import { useAuth } from '@/hooks/useAuth';
+import { renderWithProviders } from '@/tests/test-utils';
 
 describe('Milestone 1 Test Infrastructure Smoke Suite', () => {
 
@@ -184,4 +186,52 @@ describe('Milestone 1 Test Infrastructure Smoke Suite', () => {
       expect(localStorage.getItem('bunny_selected_game')).toBe('Loftia');
     });
   });
+
+  // =========================================================================
+  // Layer 7: Provider Utilities & AuthContext Integration
+  // =========================================================================
+  describe('Provider Utilities & AuthContext Integration (renderWithProviders)', () => {
+    it('supplies mock authenticated state to useAuth consumers via authValue', () => {
+      const AuthConsumer: React.FC = () => {
+        const { isAuthenticated, currentUser } = useAuth();
+        return React.createElement(
+          'div',
+          null,
+          React.createElement('span', { 'data-testid': 'auth-status' }, isAuthenticated ? 'LOGGED_IN' : 'LOGGED_OUT'),
+          React.createElement('span', { 'data-testid': 'user-email' }, currentUser?.email ?? 'NO_EMAIL')
+        );
+      };
+
+      const result = renderWithProviders(React.createElement(AuthConsumer), {
+        authValue: {
+          isAuthenticated: true,
+          currentUser: { id: 'test-user-1', email: 'test@bunny.com' } as any,
+        },
+      });
+
+      expect(result.getByTestId('auth-status')).toHaveTextContent('LOGGED_IN');
+      expect(result.getByTestId('user-email')).toHaveTextContent('test@bunny.com');
+      expect(result.user).toBeDefined();
+    });
+
+    it('supplies default mock unauthenticated state when authValue is empty', () => {
+      const AuthConsumer: React.FC = () => {
+        const { isAuthenticated, currentUser } = useAuth();
+        return React.createElement(
+          'div',
+          null,
+          React.createElement('span', { 'data-testid': 'auth-status' }, isAuthenticated ? 'LOGGED_IN' : 'LOGGED_OUT'),
+          React.createElement('span', { 'data-testid': 'user-email' }, currentUser?.email ?? 'NO_EMAIL')
+        );
+      };
+
+      const result = renderWithProviders(React.createElement(AuthConsumer), {
+        authValue: {},
+      });
+
+      expect(result.getByTestId('auth-status')).toHaveTextContent('LOGGED_OUT');
+      expect(result.getByTestId('user-email')).toHaveTextContent('NO_EMAIL');
+    });
+  });
 });
+

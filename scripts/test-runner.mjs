@@ -162,8 +162,12 @@ function main() {
       setupSignalHandlers(child);
 
       child.on('close', (code, signal) => {
-        if (signal) process.kill(process.pid, signal);
-        else process.exit(code ?? 1);
+        if (signal) {
+          process.removeAllListeners(signal);
+          process.kill(process.pid, signal);
+        } else {
+          process.exit(code ?? 1);
+        }
       });
       return;
     }
@@ -179,8 +183,9 @@ function main() {
 
   const vitestArgs = [];
 
-  // Vitest defaults to watch mode unless 'run' is explicitly passed
-  if (!options.watch) {
+  if (options.watch) {
+    vitestArgs.push('watch');
+  } else {
     vitestArgs.push('run');
   }
 
@@ -210,6 +215,7 @@ function main() {
 
   child.on('close', (code, signal) => {
     if (signal) {
+      process.removeAllListeners(signal);
       process.kill(process.pid, signal);
     } else {
       process.exit(code ?? 1);

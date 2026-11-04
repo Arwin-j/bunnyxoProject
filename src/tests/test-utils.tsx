@@ -2,7 +2,7 @@ import React, { ReactElement, ReactNode } from 'react';
 import { render, RenderOptions, RenderResult } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { AuthProvider, AuthContextType } from '../hooks/useAuth';
+import { AuthProvider, AuthContext, AuthContextType } from '../hooks/useAuth';
 import { GameProvider, GameName } from '../hooks/useGame';
 
 // 1. Discord Presence Test Context & Default Values
@@ -34,12 +34,13 @@ export const DiscordPresenceTestProvider: React.FC<{
 };
 
 // 2. Custom Mock Auth Provider for direct state injection in tests
-export const MockAuthContext = React.createContext<AuthContextType | undefined>(undefined);
+// Export MockAuthContext as an alias to AuthContext for backwards compatibility
+export const MockAuthContext = AuthContext;
 
 export const MockAuthProvider: React.FC<{
-  value: Partial<AuthContextType>;
+  value?: Partial<AuthContextType>;
   children: ReactNode;
-}> = ({ value, children }) => {
+}> = ({ value = {}, children }) => {
   const defaultAuth: AuthContextType = {
     isAuthenticated: false,
     isSupabase: false,
@@ -50,9 +51,9 @@ export const MockAuthProvider: React.FC<{
   };
 
   return (
-    <MockAuthContext.Provider value={{ ...defaultAuth, ...value }}>
+    <AuthContext.Provider value={{ ...defaultAuth, ...value }}>
       {children}
-    </MockAuthContext.Provider>
+    </AuthContext.Provider>
   );
 };
 
@@ -130,7 +131,7 @@ export function renderWithProviders(
   return {
     user,
     ...render(ui, { wrapper: Wrapper, ...renderOptions }),
-  };
+  } as RenderWithProvidersResult;
 }
 
 // Re-export all React Testing Library and User Event utilities
