@@ -5,6 +5,7 @@ import islandMapUrl from '../assets/heartopia-island-map.jpg';
 import { Toast, ToastMessage } from '../components/admin/Toast';
 import { useInteractivePins } from '../hooks/useInteractivePins';
 import { useMapCategories } from '../hooks/useMapCategories';
+import { useGame, GameName } from '../hooks/useGame';
 import {
   GameId,
   HeartopiaMapId,
@@ -25,11 +26,32 @@ function escapeHtml(str: string): string {
 }
 
 export const MapPage: React.FC = () => {
-  // Game & Map Selection
-  const [selectedGame, setSelectedGame] = useState<GameId>('heartopia');
+  // Global Game Sync from Header
+  const { selectedGame: globalGame, setSelectedGame: setGlobalGame } = useGame();
+
+  // Map GameId to GameName and vice versa
+  const gameToId = (name: GameName): GameId => {
+    if (name === 'Petit Planet') return 'petit';
+    if (name === 'Loftia') return 'loftia';
+    return 'heartopia';
+  };
+
+  const idToGame = (id: GameId): GameName => {
+    if (id === 'petit') return 'Petit Planet';
+    if (id === 'loftia') return 'Loftia';
+    return 'Heartopia';
+  };
+
+  // Game & Map Selection (defaults to 'heartopia' to ensure the map always displays)
+  const [selectedGame, setSelectedGame] = useState<GameId>(() => gameToId(globalGame));
   const [selectedMap, setSelectedMap] = useState<HeartopiaMapId>('island');
   const [isMapDropdownOpen, setIsMapDropdownOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Keep local game selection in sync if global header game changes
+  useEffect(() => {
+    setSelectedGame(gameToId(globalGame));
+  }, [globalGame]);
 
   // Dynamic Categories Hook
   const { categories } = useMapCategories();
@@ -177,7 +199,7 @@ export const MapPage: React.FC = () => {
     if (!mapInstanceRef.current) return;
     setSelectedPinId(pin.id);
     const currentZoom = mapInstanceRef.current.getZoom();
-    const zoom = Math.max(currentZoom, 0.2);
+    const zoom = Math.max(currentZoom, -0.5);
     mapInstanceRef.current.setView([pin.y, pin.x], zoom, { animate: true });
     const marker = markersRef.current.get(pin.id);
     if (marker) {
@@ -212,29 +234,18 @@ export const MapPage: React.FC = () => {
       delete (mapContainerRef.current as any)._leaflet_id;
     }
 
-    const containerWidth = mapContainerRef.current.clientWidth || 700;
-    const containerHeight = mapContainerRef.current.clientHeight || 460;
-
-    const getCoverZoom = (w: number, h: number) => {
-      const zoomX = Math.log2(w / MAP_SIZE);
-      const zoomY = Math.log2(h / MAP_SIZE);
-      return Math.max(zoomX, zoomY) + 0.12;
-    };
-
-    const initialCoverZoom = getCoverZoom(containerWidth, containerHeight);
-
     const map = L.map(mapContainerRef.current, {
       crs: L.CRS.Simple,
-      minZoom: initialCoverZoom - 0.8,
-      maxZoom: 2.2,
-      zoomSnap: 0.05,
+      minZoom: -4,
+      maxZoom: 3,
+      zoomSnap: 0.1,
       zoomDelta: 0.5,
       attributionControl: false,
       zoomControl: false,
-      maxBoundsViscosity: 0.7,
-      touchZoom: false,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
+      maxBoundsViscosity: 0.6,
+      scrollWheelZoom: true,
+      touchZoom: true,
+      doubleClickZoom: true,
       boxZoom: false,
       keyboard: false,
       dragging: true,
@@ -246,16 +257,28 @@ export const MapPage: React.FC = () => {
     ];
 
     const paddedBounds: L.LatLngBoundsExpression = [
-      [-MAP_SIZE * 0.15, -MAP_SIZE * 0.15],
-      [MAP_SIZE * 1.15, MAP_SIZE * 1.15],
+      [-MAP_SIZE * 0.35, -MAP_SIZE * 0.35],
+      [MAP_SIZE * 1.35, MAP_SIZE * 1.35],
     ];
 
-    L.imageOverlay(islandMapUrl, mapBounds, {
+    const mapImageUrl = islandMapUrl || '/heartopia-island-map.jpg';
+
+    const imageLayer = L.imageOverlay(mapImageUrl, mapBounds, {
       className: 'leaflet-image-layer',
     }).addTo(map);
 
+    // Fallback if bundled asset path fails to load
+    const imgEl = (imageLayer as any).getElement?.() as HTMLImageElement | null;
+    if (imgEl) {
+      imgEl.onerror = () => {
+        if (!imgEl.src.endsWith('/heartopia-island-map.jpg')) {
+          imageLayer.setUrl('/heartopia-island-map.jpg');
+        }
+      };
+    }
+
     map.setMaxBounds(paddedBounds);
-    map.setView([MAP_SIZE / 2, MAP_SIZE / 2], initialCoverZoom);
+    map.fitBounds(mapBounds, { padding: [10, 10] });
 
     mapInstanceRef.current = map;
     setMapReady(true);
@@ -276,21 +299,16 @@ export const MapPage: React.FC = () => {
     };
     window.addEventListener('resize', handleResize);
 
+    // Settle size and fitBounds on mount
     const timer1 = setTimeout(() => {
       if (mapInstanceRef.current && mapContainerRef.current) {
         mapInstanceRef.current.invalidateSize();
-        const w = mapContainerRef.current.clientWidth || containerWidth;
-        const h = mapContainerRef.current.clientHeight || containerHeight;
-        const settledCoverZoom = getCoverZoom(w, h);
-        mapInstanceRef.current.setMinZoom(settledCoverZoom - 0.8);
-        mapInstanceRef.current.setView([MAP_SIZE / 2, MAP_SIZE / 2], settledCoverZoom, {
-          animate: false,
-        });
+        mapInstanceRef.current.fitBounds(mapBounds, { padding: [10, 10], animate: false });
       }
     }, 60);
 
     const timer2 = setTimeout(() => {
-      if (mapInstanceRef.current) {
+      if (mapInstanceRef.current && mapContainerRef.current) {
         mapInstanceRef.current.invalidateSize();
       }
     }, 250);
@@ -366,15 +384,13 @@ export const MapPage: React.FC = () => {
 
   // Reset Leaflet View
   const handleResetView = () => {
-    if (!mapInstanceRef.current || !mapContainerRef.current) return;
-    const w = mapContainerRef.current.clientWidth || 700;
-    const h = mapContainerRef.current.clientHeight || 460;
-    const zoomX = Math.log2(w / MAP_SIZE);
-    const zoomY = Math.log2(h / MAP_SIZE);
-    const coverZoom = Math.max(zoomX, zoomY) + 0.12;
-    mapInstanceRef.current.setView([MAP_SIZE / 2, MAP_SIZE / 2], coverZoom, {
-      animate: true,
-    });
+    if (!mapInstanceRef.current) return;
+    const mapBounds: L.LatLngBoundsExpression = [
+      [0, 0],
+      [MAP_SIZE, MAP_SIZE],
+    ];
+    mapInstanceRef.current.invalidateSize();
+    mapInstanceRef.current.fitBounds(mapBounds, { padding: [10, 10], animate: true });
   };
 
   const currentGame = GAMES.find((g) => g.id === selectedGame) || GAMES[0];
@@ -401,6 +417,7 @@ export const MapPage: React.FC = () => {
                 type="button"
                 onClick={() => {
                   setSelectedGame(game.id);
+                  setGlobalGame(idToGame(game.id));
                   setIsMapDropdownOpen(false);
                 }}
                 className={`tab-v2 text-xs sm:text-sm py-1 px-3.5 min-h-[34px] flex items-center gap-1.5 ${
@@ -763,6 +780,7 @@ export const MapPage: React.FC = () => {
               onClick={() => {
                 setSelectedGame('heartopia');
                 setSelectedMap('island');
+                setGlobalGame('Heartopia');
               }}
               className="btn-v2"
             >

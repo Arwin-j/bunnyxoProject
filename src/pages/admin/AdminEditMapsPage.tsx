@@ -207,31 +207,18 @@ export const AdminEditMapsPage: React.FC = () => {
       delete (mapContainerRef.current as any)._leaflet_id;
     }
 
-    const getCoverZoom = (w: number, h: number) => {
-      const zoomX = Math.log2(w / MAP_SIZE);
-      const zoomY = Math.log2(h / MAP_SIZE);
-      return Math.max(zoomX, zoomY) + 0.12;
-    };
-
-    const containerWidth =
-      mapContainerRef.current.clientWidth > 0 ? mapContainerRef.current.clientWidth : 700;
-    const containerHeight =
-      mapContainerRef.current.clientHeight > 0 ? mapContainerRef.current.clientHeight : 460;
-
-    const initialCoverZoom = getCoverZoom(containerWidth, containerHeight);
-
     const map = L.map(mapContainerRef.current, {
       crs: L.CRS.Simple,
-      minZoom: initialCoverZoom - 0.8,
-      maxZoom: 2,
-      zoomSnap: 0.05,
+      minZoom: -4,
+      maxZoom: 3,
+      zoomSnap: 0.1,
       zoomDelta: 0.5,
       attributionControl: false,
       zoomControl: false,
-      maxBoundsViscosity: 0.7,
-      touchZoom: false,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
+      maxBoundsViscosity: 0.6,
+      scrollWheelZoom: true,
+      touchZoom: true,
+      doubleClickZoom: true,
       boxZoom: false,
       keyboard: false,
       dragging: true,
@@ -243,16 +230,28 @@ export const AdminEditMapsPage: React.FC = () => {
     ];
 
     const paddedBounds: L.LatLngBoundsExpression = [
-      [-MAP_SIZE * 0.15, -MAP_SIZE * 0.15],
-      [MAP_SIZE * 1.15, MAP_SIZE * 1.15],
+      [-MAP_SIZE * 0.35, -MAP_SIZE * 0.35],
+      [MAP_SIZE * 1.35, MAP_SIZE * 1.35],
     ];
 
-    L.imageOverlay(islandMapUrl, mapBounds, {
+    const mapImageUrl = islandMapUrl || '/heartopia-island-map.jpg';
+
+    const imageLayer = L.imageOverlay(mapImageUrl, mapBounds, {
       className: 'leaflet-image-layer',
     }).addTo(map);
 
+    // Fallback if bundled asset path fails to load
+    const imgEl = (imageLayer as any).getElement?.() as HTMLImageElement | null;
+    if (imgEl) {
+      imgEl.onerror = () => {
+        if (!imgEl.src.endsWith('/heartopia-island-map.jpg')) {
+          imageLayer.setUrl('/heartopia-island-map.jpg');
+        }
+      };
+    }
+
     map.setMaxBounds(paddedBounds);
-    map.setView([MAP_SIZE / 2, MAP_SIZE / 2], initialCoverZoom);
+    map.fitBounds(mapBounds, { padding: [10, 10] });
 
     // Map click handler in "Adjust Pins" mode
     map.on('click', (e: L.LeafletMouseEvent) => {
@@ -302,13 +301,7 @@ export const AdminEditMapsPage: React.FC = () => {
     const timer1 = setTimeout(() => {
       if (mapInstanceRef.current && mapContainerRef.current) {
         mapInstanceRef.current.invalidateSize();
-        const w = mapContainerRef.current.clientWidth || containerWidth;
-        const h = mapContainerRef.current.clientHeight || containerHeight;
-        const settledCoverZoom = getCoverZoom(w, h);
-        mapInstanceRef.current.setMinZoom(settledCoverZoom - 0.8);
-        mapInstanceRef.current.setView([MAP_SIZE / 2, MAP_SIZE / 2], settledCoverZoom, {
-          animate: false,
-        });
+        mapInstanceRef.current.fitBounds(mapBounds, { padding: [10, 10], animate: false });
       }
     }, 60);
 
@@ -591,15 +584,13 @@ export const AdminEditMapsPage: React.FC = () => {
 
   // Reset Leaflet View
   const handleResetView = () => {
-    if (!mapInstanceRef.current || !mapContainerRef.current) return;
-    const w = mapContainerRef.current.clientWidth || 700;
-    const h = mapContainerRef.current.clientHeight || 460;
-    const zoomX = Math.log2(w / MAP_SIZE);
-    const zoomY = Math.log2(h / MAP_SIZE);
-    const coverZoom = Math.max(zoomX, zoomY) + 0.12;
-    mapInstanceRef.current.setView([MAP_SIZE / 2, MAP_SIZE / 2], coverZoom, {
-      animate: true,
-    });
+    if (!mapInstanceRef.current) return;
+    const mapBounds: L.LatLngBoundsExpression = [
+      [0, 0],
+      [MAP_SIZE, MAP_SIZE],
+    ];
+    mapInstanceRef.current.invalidateSize();
+    mapInstanceRef.current.fitBounds(mapBounds, { padding: [10, 10], animate: true });
   };
 
   // Export Data JSON

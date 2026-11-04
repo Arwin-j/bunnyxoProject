@@ -102,17 +102,17 @@ export const AdminOverviewPage: React.FC = () => {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-foreground/20 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e9b3ad]/40 pb-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Overview</h1>
-          <p className="mt-1 font-mono text-xs sm:text-sm text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#6b4f35] font-heading">Overview</h1>
+          <p className="mt-1 font-mono text-xs sm:text-sm text-[#8c6f55]">
             Developer console for managing Bunny Hub events and schedule.
           </p>
         </div>
 
         <Link
           to="/admin/edit"
-          className="sticker shadow-ink inline-flex items-center gap-2 rounded-xl border-2 border-foreground bg-primary px-4 py-2 text-sm font-bold hover:bg-accent transition-all active:translate-y-0.5"
+          className="btn-v2"
         >
           <span>➕</span>
           <span>New Event</span>
@@ -404,3 +404,5 @@ export const AdminOverviewPage: React.FC = () => {
     </main>
   );
 };
+
+export default AdminOverviewPage;

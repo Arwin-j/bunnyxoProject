@@ -4,11 +4,11 @@ import { useGame, GAME_OPTIONS } from '../../hooks/useGame';
 import { useDiscordPresence } from '../../hooks/useDiscordPresence';
 
 const NAV_LINKS = [
-  { to: '/events', label: 'Collection' },
+  { to: '/events', label: 'Events' },
+  { to: '/collection', label: 'Collection' },
   { to: '/map', label: 'Map' },
   { to: '/codes', label: 'Codes' },
   { to: '/feed', label: 'Feed' },
-  { to: '/about', label: 'About us' },
 ];
 
 const DISCORD_LINK = 'https://discord.gg/9CNHMrX6A';
@@ -65,6 +65,12 @@ export const Header: React.FC = () => {
     location.pathname.startsWith('/codes') ||
     location.pathname.startsWith('/redemption-codes');
 
+  const isAboutPage = location.pathname.startsWith('/about');
+  const isHideGameDropdown =
+    location.pathname.startsWith('/events') ||
+    location.pathname.startsWith('/map') ||
+    location.pathname.startsWith('/feed');
+
   const selectedGameIcon =
     GAME_OPTIONS.find((g) => g.name === selectedGame)?.icon || '🌸';
 
@@ -91,6 +97,7 @@ export const Header: React.FC = () => {
           padding: '10px 18px',
           boxSizing: 'border-box',
           width: '100%',
+          marginBottom: isAboutPage ? '16px' : 0,
         }}
       >
         {/* Circular Dashed Logo - Navigates to Home on click */}
@@ -127,14 +134,12 @@ export const Header: React.FC = () => {
           />
         </Link>
 
-        {/* Navigation Pills */}
+        {/* Navigation Pills: Events, Collection, Map, Codes, Feed */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           {NAV_LINKS.map((link) => {
             const isActive =
               link.to === '/codes'
                 ? isCodesActive
-                : link.to === '/events'
-                ? location.pathname.startsWith('/events') || location.pathname.startsWith('/collection')
                 : location.pathname.startsWith(link.to);
 
             return (
@@ -165,127 +170,153 @@ export const Header: React.FC = () => {
           })}
         </div>
 
-        {/* Spacer on right */}
-        <div style={{ flex: 1 }} />
+        {/* Right side: About us on the most right edge of navigation bar */}
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+          <NavLink
+            to="/about"
+            className={`nv ${location.pathname.startsWith('/about') ? 'on active' : ''}`}
+            style={{
+              background: location.pathname.startsWith('/about') ? '#b23a6b' : '#f3ecda',
+              color: location.pathname.startsWith('/about') ? '#ffffff' : '#b23a6b',
+              fontFamily: 'Fredoka, sans-serif',
+              fontWeight: 600,
+              fontSize: '16px',
+              borderRadius: '999px',
+              padding: '9px 16px',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.15s ease',
+              border: 0,
+              cursor: 'pointer',
+            }}
+          >
+            About us
+          </NavLink>
+        </div>
       </nav>
 
-      {/* Persistent Two Cards: Welcome back Bunny + Live Petit Planet Update */}
-      <div className="v2-hero-grid" style={{ marginTop: '16px', marginBottom: '20px' }}>
-        {/* Left Card: Welcome Card with Game Dropdown & Discord Widget */}
-        <section
-          className="card"
-          style={{
-            background: 'linear-gradient(120deg, #fbd5e1, #f6c9b8)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-            borderRadius: '24px',
-            padding: '18px',
-            boxSizing: 'border-box',
-            position: 'relative',
-            boxShadow: '0 6px 22px rgba(178, 58, 107, 0.12)',
-          }}
-        >
-          {/* Game Selector Dropdown Menu */}
-          <div style={{ position: 'relative', display: 'inline-block' }} ref={dropdownRef}>
-            <button
-              type="button"
-              onClick={() => setGameDropdownOpen(!gameDropdownOpen)}
-              className="tab"
-              aria-haspopup="true"
-              aria-expanded={gameDropdownOpen}
-              style={{
-                border: '2px solid #fbd5e1',
-                borderRadius: '999px',
-                padding: '8px 18px',
-                fontFamily: 'Fredoka, sans-serif',
-                fontWeight: 600,
-                fontSize: '15px',
-                minHeight: '40px',
-                background: '#fff3f0',
-                color: '#b23a6b',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                transition: 'all 0.15s ease',
-                boxShadow: '0 2px 8px rgba(178, 58, 107, 0.08)',
-              }}
-            >
-              <span>{selectedGameIcon}</span>
-              <span>{selectedGame}</span>
-              <span
+      {/* Persistent Two Cards: Welcome back Bunny + Live Petit Planet Update (hidden on /about) */}
+      {!isAboutPage && (
+        <div className="v2-hero-grid" style={{ marginTop: '16px', marginBottom: '20px' }}>
+          {/* Left Card: Welcome Card with Game Dropdown & Discord Widget */}
+          <section
+            className="card"
+            style={{
+              background: 'linear-gradient(120deg, #fbd5e1, #f6c9b8)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              borderRadius: '24px',
+              padding: '18px',
+              boxSizing: 'border-box',
+              position: 'relative',
+              boxShadow: '0 6px 22px rgba(178, 58, 107, 0.12)',
+            }}
+          >
+          {/* Game Selector Dropdown Menu (Hidden on /events, /map, /feed) */}
+          {!isHideGameDropdown && (
+            <div style={{ position: 'relative', display: 'inline-block' }} ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setGameDropdownOpen(!gameDropdownOpen)}
+                className="tab"
+                aria-haspopup="true"
+                aria-expanded={gameDropdownOpen}
                 style={{
-                  fontSize: '10px',
-                  transition: 'transform 0.15s ease',
-                  transform: gameDropdownOpen ? 'rotate(180deg)' : 'none',
-                }}
-              >
-                ▼
-              </span>
-            </button>
-
-            {/* Dropdown Menu Options */}
-            {gameDropdownOpen && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 'calc(100% + 6px)',
-                  left: 0,
-                  background: '#fff3f0',
-                  borderRadius: '18px',
                   border: '2px solid #fbd5e1',
-                  boxShadow: '0 10px 25px rgba(107, 79, 53, 0.15)',
-                  zIndex: 60,
-                  padding: '6px',
-                  minWidth: '190px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px',
+                  borderRadius: '999px',
+                  padding: '8px 18px',
+                  fontFamily: 'Fredoka, sans-serif',
+                  fontWeight: 600,
+                  fontSize: '15px',
+                  minHeight: '40px',
+                  background: '#fff3f0',
+                  color: '#b23a6b',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.15s ease',
+                  boxShadow: '0 2px 8px rgba(178, 58, 107, 0.08)',
                 }}
               >
-                {GAME_OPTIONS.map((g) => {
-                  const isSelected = selectedGame === g.name;
-                  return (
-                    <button
-                      key={g.name}
-                      type="button"
-                      onClick={() => {
-                        setSelectedGame(g.name);
-                        setGameDropdownOpen(false);
-                      }}
-                      style={{
-                        background: isSelected ? '#b23a6b' : 'transparent',
-                        color: isSelected ? '#ffffff' : '#6b4f35',
-                        border: 0,
-                        borderRadius: '12px',
-                        padding: '10px 14px',
-                        textAlign: 'left',
-                        fontFamily: 'Fredoka, sans-serif',
-                        fontWeight: 600,
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        transition: 'all 0.12s ease',
-                        width: '100%',
-                        boxSizing: 'border-box',
-                      }}
-                    >
-                      <span>{g.icon}</span>
-                      <span>{g.name}</span>
-                      {isSelected && (
-                        <span style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: 'bold' }}>
-                          ✓
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                <span>{selectedGameIcon}</span>
+                <span>{selectedGame}</span>
+                <span
+                  style={{
+                    fontSize: '10px',
+                    transition: 'transform 0.15s ease',
+                    transform: gameDropdownOpen ? 'rotate(180deg)' : 'none',
+                  }}
+                >
+                  ▼
+                </span>
+              </button>
+
+              {/* Dropdown Menu Options */}
+              {gameDropdownOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 6px)',
+                    left: 0,
+                    background: '#fff3f0',
+                    borderRadius: '18px',
+                    border: '2px solid #fbd5e1',
+                    boxShadow: '0 10px 25px rgba(107, 79, 53, 0.15)',
+                    zIndex: 60,
+                    padding: '6px',
+                    minWidth: '190px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                  }}
+                >
+                  {GAME_OPTIONS.map((g) => {
+                    const isSelected = selectedGame === g.name;
+                    return (
+                      <button
+                        key={g.name}
+                        type="button"
+                        onClick={() => {
+                          setSelectedGame(g.name);
+                          setGameDropdownOpen(false);
+                        }}
+                        style={{
+                          background: isSelected ? '#b23a6b' : 'transparent',
+                          color: isSelected ? '#ffffff' : '#6b4f35',
+                          border: 0,
+                          borderRadius: '12px',
+                          padding: '10px 14px',
+                          textAlign: 'left',
+                          fontFamily: 'Fredoka, sans-serif',
+                          fontWeight: 600,
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          transition: 'all 0.12s ease',
+                          width: '100%',
+                          boxSizing: 'border-box',
+                        }}
+                      >
+                        <span>{g.icon}</span>
+                        <span>{g.name}</span>
+                        {isSelected && (
+                          <span style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: 'bold' }}>
+                            ✓
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
 
           <h1
             style={{
@@ -561,6 +592,7 @@ export const Header: React.FC = () => {
           </a>
         </section>
       </div>
+      )}
     </header>
   );
 };

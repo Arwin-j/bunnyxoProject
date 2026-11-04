@@ -4,8 +4,10 @@ import { Header } from './components/common/Header';
 import { WelcomePage } from './pages/WelcomePage';
 import { HomePage } from './pages/HomePage';
 import { EventsPage } from './pages/EventsPage';
+import { CollectionPage } from './pages/CollectionPage';
 import { MapPage } from './pages/MapPage';
 import { FeedPage } from './pages/FeedPage';
+import { AboutPage } from './pages/AboutPage';
 import { UpdatesPage } from './pages/UpdatesPage';
 import { RedemptionCodesPage } from './pages/RedemptionCodesPage';
 import { AdminLayout } from './components/admin/AdminLayout';
@@ -39,10 +41,10 @@ export const App: React.FC = () => {
       <Route element={<PublicLayout />}>
         <Route path="/home" element={<HomePage />} />
         <Route path="/events" element={<EventsPage />} />
-        <Route path="/collection" element={<Navigate to="/events" replace />} />
+        <Route path="/collection" element={<CollectionPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/feed" element={<FeedPage />} />
-        <Route path="/about" element={<Navigate to="/feed" replace />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="/guides" element={<Navigate to="/feed" replace />} />
         <Route path="/updates" element={<UpdatesPage />} />
         <Route path="/games" element={<Navigate to="/updates" replace />} />

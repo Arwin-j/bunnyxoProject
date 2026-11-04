@@ -23,3 +23,7 @@ pnpm-debug.log*
 
 # Temporary reference designs
 design-v2-ref/
+
+# Agent teamwork logs
+.agents/
+
