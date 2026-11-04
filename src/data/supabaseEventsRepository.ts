@@ -41,26 +41,16 @@ export class SupabaseEventsRepository implements EventsRepository {
       }
 
       if (!data || data.length === 0) {
-        // If Supabase table is empty, seed with fallback events
-        const localList = await this.fallbackRepo.list(filter);
-        return localList;
+        return [];
       }
 
-      // Check if Supabase returned any ongoing or upcoming events
-      const now = Date.now();
-      const hasActiveOrUpcoming = data.some((e) => new Date(e.ends_at).getTime() > now);
+      // Filter out legacy test event
+      const legacyEventIds = new Set(['891f9ff9-75dc-4ba5-978b-e8dd66a18880']);
+      const activeEvents = (data as HeartopiaEvent[]).filter(
+        (e) => !legacyEventIds.has(e.id)
+      );
 
-      if (!hasActiveOrUpcoming) {
-        // Supabase only contains past/expired events; provide fresh local sample events
-        // so the home and events calendar are never empty
-        const localList = await this.fallbackRepo.list(filter);
-        // Combine any unique custom events with fresh active sample events
-        const localIds = new Set(localList.map((e) => e.id));
-        const customPastEvents = data.filter((e) => !localIds.has(e.id));
-        return [...localList, ...customPastEvents] as HeartopiaEvent[];
-      }
-
-      return data as HeartopiaEvent[];
+      return activeEvents;
     } catch (err) {
       console.warn('SupabaseEventsRepository.list network exception, falling back:', err);
       return this.fallbackRepo.list(filter);

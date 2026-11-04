@@ -4,6 +4,9 @@ import { useRedemptionCodes } from '../hooks/useRedemptionCodes';
 import { useGame } from '../hooks/useGame';
 import { useDiscordPresence } from '../hooks/useDiscordPresence';
 import { useHomeUpdates } from '../hooks/useHomeUpdates';
+import { useCommunitySpotlights } from '../hooks/useCommunitySpotlights';
+import { SubmitSpotlightModal } from '../components/home/SubmitSpotlightModal';
+import { useFeedPosts } from '../hooks/useFeedPosts';
 
 const DISCORD_LINK = 'https://discord.gg/9CNHMrX6A';
 const INSTAGRAM_LINK =
@@ -14,6 +17,24 @@ export const HomePage: React.FC = () => {
   const { selectedGame } = useGame();
   const { onlineCount: discordOnline } = useDiscordPresence();
   const { activeUpdate } = useHomeUpdates();
+  const { featuredSpotlight, submitSpotlight } = useCommunitySpotlights();
+  const { posts: feedPosts } = useFeedPosts();
+  const topFeedPosts = feedPosts.slice(0, 4);
+
+  // Community Spotlight submit modal & success toast
+  const [isSpotlightModalOpen, setIsSpotlightModalOpen] = useState(false);
+  const [spotlightSuccessToast, setSpotlightSuccessToast] = useState<string | null>(null);
+
+  const handleSubmitSpotlight = async (data: {
+    name: string;
+    username: string;
+    title: string;
+    imageFile: File;
+  }) => {
+    await submitSpotlight(data);
+    setSpotlightSuccessToast('Yay! Your work was submitted! It will appear in Admin Edit Home for review. 🌸');
+    setTimeout(() => setSpotlightSuccessToast(null), 4000);
+  };
 
   // Copied state for individual code rows
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
@@ -249,7 +270,6 @@ export const HomePage: React.FC = () => {
                 boxSizing: 'border-box',
                 textDecoration: 'none',
                 color: 'inherit',
-                transition: 'transform 0.15s ease',
               }}
             >
               <div
@@ -297,7 +317,6 @@ export const HomePage: React.FC = () => {
                 boxSizing: 'border-box',
                 cursor: 'pointer',
                 userSelect: 'none',
-                transition: 'all 0.18s ease',
               }}
             >
               <div
@@ -341,7 +360,6 @@ export const HomePage: React.FC = () => {
                 boxSizing: 'border-box',
                 textDecoration: 'none',
                 color: 'inherit',
-                transition: 'transform 0.15s ease',
               }}
             >
               <div
@@ -455,6 +473,9 @@ export const HomePage: React.FC = () => {
                 borderRadius: '24px',
                 padding: '18px',
                 boxSizing: 'border-box',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
               }}
             >
               <h2
@@ -467,111 +488,6 @@ export const HomePage: React.FC = () => {
               >
                 Discord feed
               </h2>
-              <div
-                className="row"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  gap: '4px',
-                  background: '#f9f4e6',
-                  borderRadius: '14px',
-                  padding: '10px 12px',
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  color: '#6b4f35',
-                }}
-              >
-                <strong style={{ color: '#7a5638' }}>Spring Blossom Gala Announcement</strong>
-                <span className="sub" style={{ fontSize: '13px', color: '#8c6f55' }}>
-                  Join us this Friday for photo sessions and star coin raffles!
-                </span>
-              </div>
-
-              <div
-                className="row"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: '10px',
-                  background: '#f9f4e6',
-                  borderRadius: '14px',
-                  padding: '10px 12px',
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  color: '#6b4f35',
-                }}
-              >
-                <span>Phantom Glow Patch release</span>
-                <span
-                  className="tag"
-                  style={{
-                    background: '#e9b3ad',
-                    color: '#6b4f35',
-                    borderRadius: '999px',
-                    padding: '2px 10px',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  Heartopia
-                </span>
-              </div>
-
-              <div
-                className="row"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: '10px',
-                  background: '#f9f4e6',
-                  borderRadius: '14px',
-                  padding: '10px 12px',
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  color: '#6b4f35',
-                }}
-              >
-                <span>Sky Island housing preview</span>
-                <span
-                  className="tag"
-                  style={{
-                    background: '#d9e0b4',
-                    color: '#6e7a3c',
-                    borderRadius: '999px',
-                    padding: '2px 10px',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  Loftia
-                </span>
-              </div>
-
-              <div
-                className="row"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: '10px',
-                  background: '#f9f4e6',
-                  borderRadius: '14px',
-                  padding: '10px 12px',
-                  marginBottom: '8px',
-                  fontSize: '14px',
-                  color: '#6b4f35',
-                }}
-              >
-                <span>Next community event coming soon</span>
-                <span className="sub" style={{ fontSize: '13px', color: '#8c6f55' }}>
-                  Nov 2nd
-                </span>
-              </div>
 
               <a
                 href={DISCORD_LINK}
@@ -580,7 +496,7 @@ export const HomePage: React.FC = () => {
                 className="btn g"
                 style={{
                   width: '100%',
-                  marginTop: '4px',
+                  marginTop: 'auto',
                   background: '#6e7a3c',
                   color: '#fff',
                   border: 0,
@@ -710,56 +626,126 @@ export const HomePage: React.FC = () => {
                 borderRadius: '24px',
                 padding: '18px',
                 boxSizing: 'border-box',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
               }}
             >
-              <h2
-                style={{
-                  margin: '0 0 10px',
-                  fontFamily: 'Lora, serif',
-                  fontSize: '19px',
-                  color: '#7a5638',
-                }}
-              >
-                Community spotlight
-              </h2>
-              <div
-                className="ph"
-                style={{
-                  height: '140px',
-                  borderRadius: '16px',
-                  background: 'linear-gradient(135deg, #fbd5e1, #f6c9b8)',
-                  display: 'flex',
-                  alignItems: 'flex-end',
-                  padding: '10px',
-                  boxSizing: 'border-box',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  color: '#6b4f35',
-                }}
-              >
-                🌸 Cozy Bakery Garden Build
+              <div>
+                <h2
+                  style={{
+                    margin: '0 0 10px',
+                    fontFamily: 'Lora, serif',
+                    fontSize: '19px',
+                    color: '#7a5638',
+                  }}
+                >
+                  Community spotlight
+                </h2>
+
+                {featuredSpotlight ? (
+                  <div
+                    style={{
+                      height: '140px',
+                      borderRadius: '16px',
+                      overflow: 'hidden',
+                      position: 'relative',
+                      border: '1.5px solid rgba(107, 79, 53, 0.2)',
+                      boxShadow: '0 2px 8px rgba(107, 79, 53, 0.08)',
+                    }}
+                  >
+                    <img
+                      src={featuredSpotlight.imageUrl}
+                      alt={featuredSpotlight.title}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background:
+                          'linear-gradient(to top, rgba(74, 40, 53, 0.8) 0%, transparent 60%)',
+                        display: 'flex',
+                        alignItems: 'flex-end',
+                        padding: '10px 12px',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        color: '#ffffff',
+                        textShadow: '0 1px 2px rgba(0,0,0,0.6)',
+                      }}
+                    >
+                      🌸 {featuredSpotlight.title}
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      height: '140px',
+                      borderRadius: '16px',
+                      background: 'linear-gradient(135deg, #fef4e8, #fdf0f4)',
+                      border: '1.5px dashed #e9b3ad',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      padding: '12px',
+                      boxSizing: 'border-box',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <span style={{ fontSize: '24px' }}>📸</span>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: '#7a5638' }}>
+                      No spotlight featured yet
+                    </span>
+                    <span style={{ fontSize: '11px', color: '#8c6f55' }}>
+                      Share your cozy builds, outfits & island photos!
+                    </span>
+                  </div>
+                )}
               </div>
+
               <p
                 className="sub"
                 style={{
                   margin: '10px 0 0',
                   fontSize: '13px',
                   color: '#6b4f35',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '8px',
+                  flexWrap: 'wrap',
                 }}
               >
-                By <strong>@cozycottage</strong> ·{' '}
-                <a
-                  href={DISCORD_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                {featuredSpotlight ? (
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '170px' }}>
+                    By <strong>@{featuredSpotlight.username}</strong>
+                  </span>
+                ) : (
+                  <span>Have a cozy creation?</span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIsSpotlightModalOpen(true)}
                   style={{
+                    background: 'transparent',
+                    border: 0,
+                    padding: 0,
                     color: '#b23a6b',
                     fontWeight: 700,
-                    textDecoration: 'none',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
                   }}
                 >
-                  Submit yours
-                </a>
+                  Submit yours {featuredSpotlight ? '' : '→'}
+                </button>
               </p>
             </section>
 
@@ -775,7 +761,7 @@ export const HomePage: React.FC = () => {
             >
               <h2
                 style={{
-                  margin: '0 0 8px',
+                  margin: '0',
                   fontFamily: 'Lora, serif',
                   fontSize: '19px',
                   color: '#7a5638',
@@ -783,66 +769,6 @@ export const HomePage: React.FC = () => {
               >
                 Collection
               </h2>
-              <p
-                className="sub"
-                style={{
-                  fontSize: '13px',
-                  color: '#6b4f35',
-                  margin: '0 0 8px',
-                }}
-              >
-                16 of 34 items found
-              </p>
-              <div
-                style={{
-                  background: '#f9f4e6',
-                  borderRadius: '999px',
-                  height: '10px',
-                  overflow: 'hidden',
-                  margin: '6px 0 12px',
-                }}
-              >
-                <div
-                  style={{
-                    background: '#b23a6b',
-                    height: '100%',
-                    width: '47%',
-                    borderRadius: '999px',
-                  }}
-                />
-              </div>
-              <p
-                className="sub"
-                style={{
-                  fontSize: '13px',
-                  color: '#6b4f35',
-                  margin: '0 0 14px',
-                }}
-              >
-                Newest: <strong>Starry Cloud Lantern</strong>
-              </p>
-              <Link
-                to="/events"
-                className="btn g"
-                style={{
-                  background: '#6e7a3c',
-                  color: '#ffffff',
-                  border: 0,
-                  borderRadius: '999px',
-                  padding: '8px 16px',
-                  fontFamily: 'Nunito, sans-serif',
-                  fontWeight: 700,
-                  fontSize: '13px',
-                  minHeight: '38px',
-                  cursor: 'pointer',
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                View collection
-              </Link>
             </section>
 
             {/* Card 3: Recent on Instagram */}
@@ -888,7 +814,7 @@ export const HomePage: React.FC = () => {
                 </a>
               </div>
 
-              {/* 4-column thumbnail placeholder grid */}
+              {/* 4-column thumbnail grid connected to top 4 contents from Feed page */}
               <div
                 style={{
                   display: 'grid',
@@ -896,90 +822,80 @@ export const HomePage: React.FC = () => {
                   gap: '8px',
                 }}
               >
-                <a
-                  href={INSTAGRAM_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ph"
-                  style={{
-                    aspectRatio: '1',
-                    textDecoration: 'none',
-                    color: '#6b4f35',
-                    borderRadius: '16px',
-                    background: 'linear-gradient(135deg, #f6c9b8, #e9b3ad)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '18px',
-                    fontWeight: 700,
-                  }}
-                >
-                  🌸
-                </a>
-                <a
-                  href={INSTAGRAM_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ph"
-                  style={{
-                    aspectRatio: '1',
-                    textDecoration: 'none',
-                    color: '#6b4f35',
-                    borderRadius: '16px',
-                    background: 'linear-gradient(135deg, #fbd5e1, #f6c9b8)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '18px',
-                    fontWeight: 700,
-                  }}
-                >
-                  🎀
-                </a>
-                <a
-                  href={INSTAGRAM_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ph"
-                  style={{
-                    aspectRatio: '1',
-                    textDecoration: 'none',
-                    color: '#6b4f35',
-                    borderRadius: '16px',
-                    background: 'linear-gradient(135deg, #f6c9b8, #e9b3ad)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '18px',
-                    fontWeight: 700,
-                  }}
-                >
-                  ☕
-                </a>
-                <a
-                  href={INSTAGRAM_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ph"
-                  style={{
-                    aspectRatio: '1',
-                    textDecoration: 'none',
-                    color: '#6b4f35',
-                    borderRadius: '16px',
-                    background: 'linear-gradient(135deg, #fbd5e1, #f6c9b8)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '18px',
-                    fontWeight: 700,
-                  }}
-                >
-                  ✨
-                </a>
+                {topFeedPosts.map((post) => {
+                  const coverImage = post.thumbnail_url || post.media_url;
+                  return (
+                    <a
+                      key={post.id}
+                      href={post.permalink || INSTAGRAM_LINK}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={post.caption}
+                      className="ph"
+                      style={{
+                        aspectRatio: '1',
+                        textDecoration: 'none',
+                        color: '#6b4f35',
+                        borderRadius: '16px',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        border: '1.5px solid rgba(107, 79, 53, 0.15)',
+                        display: 'block',
+                        background: '#fbd5e1',
+                      }}
+                    >
+                      <img
+                        src={coverImage}
+                        alt={post.caption ? post.caption.slice(0, 40) : 'Recent on Instagram'}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          display: 'block',
+                        }}
+                      />
+                    </a>
+                  );
+                })}
               </div>
             </section>
           </div>
         </>
+      )}
+
+      {/* Community Spotlight Submission Modal */}
+      <SubmitSpotlightModal
+        isOpen={isSpotlightModalOpen}
+        onClose={() => setIsSpotlightModalOpen(false)}
+        onSubmit={handleSubmitSpotlight}
+      />
+
+      {/* Success Toast */}
+      {spotlightSuccessToast && (
+        <div
+          role="status"
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            zIndex: 99999,
+            background: '#ffffff',
+            border: '2px solid #6b4f35',
+            boxShadow: '0 6px 20px rgba(107, 79, 53, 0.2)',
+            borderRadius: '18px',
+            padding: '12px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            fontSize: '13px',
+            fontWeight: 700,
+            color: '#6b4f35',
+            animation: 'slideUp 0.25s ease',
+          }}
+        >
+          <span style={{ fontSize: '18px' }}>🌸</span>
+          <span>{spotlightSuccessToast}</span>
+        </div>
       )}
     </main>
   );

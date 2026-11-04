@@ -1039,10 +1039,10 @@ export const AdminEditMapsPage: React.FC = () => {
                     type="button"
                     onClick={() => setIsResetConfirmOpen(true)}
                     className="flex items-center gap-1.5 rounded-xl border-2 border-foreground bg-white hover:bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-700 shadow-xs active:translate-y-0.5 transition-all cursor-pointer select-none"
-                    title="Reset all pins back to default locations"
+                    title="Remove all pins from map and database"
                   >
-                    <span>🔄</span>
-                    <span>Reset</span>
+                    <span>🗑️</span>
+                    <span>Clear Pins</span>
                   </button>
                 </div>
               </div>
@@ -1573,18 +1573,19 @@ export const AdminEditMapsPage: React.FC = () => {
         onCancel={() => setDeletingPinId(null)}
       />
 
-      {/* Reset Confirmation Modal */}
+      {/* Reset / Clear Confirmation Modal */}
       <ConfirmModal
         isOpen={isResetConfirmOpen}
-        title="Reset All Pins?"
-        message="Are you sure you want to reset all pins back to the default map locations? Any custom pins will be replaced."
-        confirmLabel="Reset Pins"
+        title="Clear All Pins?"
+        message="Are you sure you want to remove all pins from the map and database?"
+        confirmLabel="Clear All Pins"
+        isDestructive={true}
         onConfirm={() => {
           resetPins();
           setToast({
             id: String(Date.now()),
             type: 'info',
-            text: 'Reset all pins to default positions.',
+            text: 'Removed all pins from map.',
           });
           setIsResetConfirmOpen(false);
           setEditingPin(null);

@@ -404,7 +404,7 @@ export const AdminEditPage: React.FC = () => {
       <AdminEditTabs currentTab="events" />
 
       {/* Top Bar with "Edit Events" and "+ New event" Button */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6" style={{ maxWidth: '560px', width: '100%' }}>
         <div className="flex items-center gap-3">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground font-sans flex items-center gap-2">
             <span>Edit Events</span>
@@ -433,7 +433,7 @@ export const AdminEditPage: React.FC = () => {
                   setSearchParams({});
                 }
               }}
-              className="rounded-xl border-2 border-foreground/50 bg-card px-3 py-2 font-sans text-xs sm:text-sm font-semibold text-foreground focus:border-foreground focus:outline-none cursor-pointer max-w-[200px] truncate shadow-xs"
+              className="rounded-xl border-2 border-foreground/50 bg-card px-3 py-2 font-sans text-xs sm:text-sm font-semibold text-foreground focus:border-foreground focus:outline-none cursor-pointer max-w-[190px] truncate shadow-xs"
             >
               <option value="">📂 Select record...</option>
               {events.map((ev) => (
@@ -451,7 +451,7 @@ export const AdminEditPage: React.FC = () => {
               setForm(DEFAULT_FORM_STATE());
               setIsDirty(false);
             }}
-            className="flex items-center gap-1.5 rounded-xl border-2 border-foreground bg-card hover:bg-[#fdf2f6] px-4 py-2 font-sans font-bold text-sm text-foreground shadow-xs active:translate-y-0.5 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl border-2 border-foreground bg-card hover:bg-[#fdf2f6] px-3.5 py-2 font-sans font-bold text-xs sm:text-sm text-foreground shadow-xs active:translate-y-0.5 transition-all cursor-pointer"
           >
             <span className="text-base font-bold leading-none">+</span>
             <span>New event</span>
@@ -459,34 +459,33 @@ export const AdminEditPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Card: Styled exactly like the design reference with Tulip Pink drop-shadow */}
-      <div className="rounded-[28px] border-[2.5px] border-foreground bg-card p-6 sm:p-9 shadow-[4px_4px_0_0_#f472b6]">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSave();
-          }}
-          autoComplete="off"
-          noValidate
-        >
-          {/* Card Sub-header: "New event" / "New record" */}
-          <div className="flex items-center justify-between pb-6">
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground font-sans tracking-tight">
-              {currentEvent ? 'Edit event' : 'New event'}
-            </h2>
-            <span className="text-xs sm:text-sm font-semibold text-muted-foreground font-sans">
-              {currentEvent ? `Record #${currentEvent.id.slice(0, 8)}` : 'New record'}
-            </span>
-          </div>
+      {/* Main Card: Compact, matching content size instead of stretching horizontally */}
+      <div style={{ maxWidth: '560px', width: '100%' }}>
+        <div className="rounded-[28px] border-[2.5px] border-foreground bg-card p-5 sm:p-7 shadow-[4px_4px_0_0_#f472b6]">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSave();
+            }}
+            autoComplete="off"
+            noValidate
+          >
+            {/* Card Sub-header: "New event" / "New record" */}
+            <div className="flex items-center justify-between pb-4 border-b-2 border-dashed border-foreground/20 mb-5">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground font-sans tracking-tight">
+                {currentEvent ? 'Edit event' : 'New event'}
+              </h2>
+              <span className="text-xs sm:text-sm font-semibold text-muted-foreground font-sans">
+                {currentEvent ? `Record #${currentEvent.id.slice(0, 8)}` : 'New record'}
+              </span>
+            </div>
 
-          <div className="space-y-5">
-            {/* ROW 1: Event title + Platform */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
+            <div className="space-y-4">
               {/* Event title */}
-              <div className="w-full sm:w-[62%]">
+              <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label htmlFor="field-title" className="font-sans font-bold text-sm sm:text-base text-foreground">
-                    Event title
+                  <label htmlFor="field-title" className="font-sans font-bold text-xs sm:text-sm uppercase tracking-wider text-muted-foreground">
+                    Event title <span className="text-rose-500">*</span>
                   </label>
                   {form.title.length > 80 && (
                     <span className="text-xs font-bold text-rose-600">
@@ -509,48 +508,69 @@ export const AdminEditPage: React.FC = () => {
                   onChange={(e) => updateField('title', e.target.value)}
                   placeholder="e.g. Cozy Blossom Picnic"
                   aria-invalid={!!validation.errors.title}
-                  className="w-full rounded-full border-2 border-foreground bg-[#fdf2f6] px-5 py-2.5 text-sm sm:text-base font-semibold text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all"
+                  className="w-full rounded-full border-2 border-foreground bg-[#fdf2f6] px-4 py-2 font-sans font-bold text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all"
                 />
                 {validation.errors.title && (
-                  <p role="alert" className="mt-1 pl-4 text-xs font-bold text-rose-600">
+                  <p role="alert" className="mt-1 pl-3 text-xs font-bold text-rose-600">
                     ⚠️ {validation.errors.title}
                   </p>
                 )}
               </div>
 
-              {/* Platform */}
-              <div className="w-full sm:w-[38%]">
-                <label htmlFor="field-platform" className="block font-sans font-bold text-sm sm:text-base text-foreground mb-1.5">
-                  Platform
-                </label>
-                <div className="relative">
-                  <select
-                    id="field-platform"
-                    value={form.platform}
-                    onChange={(e) => updateField('platform', e.target.value as EventPlatform)}
-                    className="w-full appearance-none rounded-full border-2 border-foreground bg-[#fdf2f6] px-5 py-2.5 pr-10 text-sm sm:text-base font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-[#f472b6] cursor-pointer transition-all"
-                  >
-                    {Object.entries(PLATFORM_CONFIG).map(([key, meta]) => (
-                      <option key={key} value={key}>
-                        {meta.label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-foreground">
-                    <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-                    </svg>
+              {/* Platform & Prize */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                {/* Platform */}
+                <div>
+                  <label htmlFor="field-platform" className="block font-sans font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                    Platform
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="field-platform"
+                      value={form.platform}
+                      onChange={(e) => updateField('platform', e.target.value as EventPlatform)}
+                      className="w-full appearance-none rounded-full border-2 border-foreground bg-[#fdf2f6] px-4 py-2 pr-9 font-sans font-bold text-xs sm:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-[#f472b6] cursor-pointer transition-all"
+                    >
+                      {Object.entries(PLATFORM_CONFIG).map(([key, meta]) => (
+                        <option key={key} value={key}>
+                          {meta.label}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-foreground">
+                      <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            {/* ROW 2: Location + Prize */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
+                {/* Prize */}
+                <div>
+                  <label htmlFor="field-prize" className="block font-sans font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                    Prize (Optional)
+                  </label>
+                  <input
+                    id="field-prize"
+                    type="text"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-form-type="other"
+                    value={form.prize}
+                    onChange={(e) => updateField('prize', e.target.value)}
+                    placeholder="e.g. Strawberry Basket Decor"
+                    className="w-full rounded-full border-2 border-foreground bg-[#fdf2f6] px-4 py-2 font-sans font-bold text-xs sm:text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all"
+                  />
+                </div>
+              </div>
+
               {/* Location */}
-              <div className="w-full sm:w-[62%]">
-                <label htmlFor="field-location" className="block font-sans font-bold text-sm sm:text-base text-foreground mb-1.5">
-                  Location
+              <div>
+                <label htmlFor="field-location" className="block font-sans font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Location <span className="text-rose-500">*</span>
                 </label>
                 <input
                   id="field-location"
@@ -574,7 +594,7 @@ export const AdminEditPage: React.FC = () => {
                   }}
                   list="platform-locations-list"
                   placeholder="e.g. Blossom Meadow"
-                  className="w-full rounded-full border-2 border-foreground bg-[#fdf2f6] px-5 py-2.5 text-sm sm:text-base font-semibold text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all"
+                  className="w-full rounded-full border-2 border-foreground bg-[#fdf2f6] px-4 py-2 font-sans font-bold text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all"
                 />
                 <datalist id="platform-locations-list">
                   {platformLocations.map((loc) => (
@@ -583,7 +603,7 @@ export const AdminEditPage: React.FC = () => {
                 </datalist>
 
                 {/* Comfy light green chips for fast one-tap selection */}
-                <div className="mt-2 flex flex-wrap gap-1.5 pl-1">
+                <div className="mt-1.5 flex flex-wrap gap-1.5 pl-1">
                   {platformLocations.map((loc) => (
                     <button
                       key={loc}
@@ -603,317 +623,269 @@ export const AdminEditPage: React.FC = () => {
                   ))}
                 </div>
                 {validation.errors.location && (
-                  <p role="alert" className="mt-1 pl-4 text-xs font-bold text-rose-600">
+                  <p role="alert" className="mt-1 pl-3 text-xs font-bold text-rose-600">
                     ⚠️ {validation.errors.location}
                   </p>
                 )}
               </div>
 
-              {/* Prize */}
-              <div className="w-full sm:w-[38%]">
-                <label htmlFor="field-prize" className="block font-sans font-bold text-sm sm:text-base text-foreground mb-1.5">
-                  Prize
+              {/* Start date + Start time + Start day */}
+              <div>
+                <label className="block font-sans font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Start Date & Time <span className="text-rose-500">*</span>
                 </label>
-                <input
-                  id="field-prize"
-                  type="text"
+                <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                  <div
+                    onClick={() => {
+                      try {
+                        startDateInputRef.current?.showPicker();
+                      } catch {}
+                      startDateInputRef.current?.focus();
+                    }}
+                    className="w-[140px] sm:w-[150px] h-[38px] relative flex items-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-3 focus-within:ring-2 focus-within:ring-[#f472b6] cursor-pointer transition-all"
+                  >
+                    <input
+                      ref={startDateInputRef}
+                      id="field-start-date"
+                      type="date"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      data-lpignore="true"
+                      data-form-type="other"
+                      required
+                      value={form.startDate}
+                      onChange={(e) => updateField('startDate', e.target.value)}
+                      className="w-full bg-transparent font-sans text-xs font-bold text-foreground focus:outline-none cursor-pointer"
+                    />
+                  </div>
+
+                  <div
+                    onClick={() => {
+                      try {
+                        startTimeInputRef.current?.showPicker();
+                      } catch {}
+                      startTimeInputRef.current?.focus();
+                    }}
+                    className="w-[110px] sm:w-[120px] h-[38px] relative flex items-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-3 focus-within:ring-2 focus-within:ring-[#f472b6] cursor-pointer transition-all"
+                  >
+                    <input
+                      ref={startTimeInputRef}
+                      id="field-start-time"
+                      type="time"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      data-lpignore="true"
+                      data-form-type="other"
+                      required
+                      value={form.startTime}
+                      onChange={(e) => updateField('startTime', e.target.value)}
+                      className="w-full bg-transparent font-sans text-xs font-bold text-foreground focus:outline-none cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="h-[38px] px-3 flex items-center justify-center rounded-full border-2 border-foreground bg-[#fdf2f6] font-sans font-bold text-xs text-foreground select-none">
+                    {startWeekday || '—'}
+                  </div>
+                </div>
+              </div>
+
+              {/* End date + End time + End day */}
+              <div>
+                <label className="block font-sans font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                  End Date & Time <span className="text-rose-500">*</span>
+                </label>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                  <div
+                    onClick={() => {
+                      try {
+                        endDateInputRef.current?.showPicker();
+                      } catch {}
+                      endDateInputRef.current?.focus();
+                    }}
+                    className="w-[140px] sm:w-[150px] h-[38px] relative flex items-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-3 focus-within:ring-2 focus-within:ring-[#f472b6] cursor-pointer transition-all"
+                  >
+                    <input
+                      ref={endDateInputRef}
+                      id="field-end-date"
+                      type="date"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      data-lpignore="true"
+                      data-form-type="other"
+                      required
+                      value={form.endDate}
+                      onChange={(e) => updateField('endDate', e.target.value)}
+                      className="w-full bg-transparent font-sans text-xs font-bold text-foreground focus:outline-none cursor-pointer"
+                    />
+                  </div>
+
+                  <div
+                    onClick={() => {
+                      try {
+                        endTimeInputRef.current?.showPicker();
+                      } catch {}
+                      endTimeInputRef.current?.focus();
+                    }}
+                    className="w-[110px] sm:w-[120px] h-[38px] relative flex items-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-3 focus-within:ring-2 focus-within:ring-[#f472b6] cursor-pointer transition-all"
+                  >
+                    <input
+                      ref={endTimeInputRef}
+                      id="field-end-time"
+                      type="time"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      data-lpignore="true"
+                      data-form-type="other"
+                      required
+                      value={form.endTime}
+                      onChange={(e) => updateField('endTime', e.target.value)}
+                      className="w-full bg-transparent font-sans text-xs font-bold text-foreground focus:outline-none cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="h-[38px] px-3 flex items-center justify-center rounded-full border-2 border-foreground bg-[#fdf2f6] font-sans font-bold text-xs text-foreground select-none">
+                    {endWeekday || '—'}
+                  </div>
+                </div>
+                {validation.errors.endDate && (
+                  <p role="alert" className="mt-1 pl-3 text-xs font-bold text-rose-600">
+                    ⚠️ {validation.errors.endDate}
+                  </p>
+                )}
+              </div>
+
+              {/* Event details */}
+              <div>
+                <label htmlFor="field-details" className="block font-sans font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Event details
+                </label>
+                <textarea
+                  id="field-details"
+                  rows={3}
                   autoComplete="off"
                   autoCorrect="off"
                   autoCapitalize="off"
                   spellCheck={false}
                   data-lpignore="true"
                   data-form-type="other"
-                  value={form.prize}
-                  onChange={(e) => updateField('prize', e.target.value)}
-                  placeholder="e.g. Strawberry Basket Decor"
-                  className="w-full rounded-full border-2 border-foreground bg-[#fdf2f6] px-5 py-2.5 text-sm sm:text-base font-semibold text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all"
+                  value={form.details}
+                  onChange={(e) => updateField('details', e.target.value)}
+                  placeholder="Write down the cozy event description, activities, or guidelines..."
+                  className="w-full rounded-2xl border-2 border-foreground bg-[#fdf2f6] p-3 text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all resize-y min-h-[85px]"
                 />
               </div>
-            </div>
 
-            {/* ROW 3: Start date + Start time + Start day (Shorter Compact Pills) */}
-            <div className="flex flex-wrap items-end gap-3 sm:gap-4">
-              {/* Start date */}
-              <div>
-                <label htmlFor="field-start-date" className="block font-sans font-bold text-sm sm:text-base text-foreground mb-1.5">
-                  Start date
-                </label>
-                <div
-                  onClick={() => {
-                    try {
-                      startDateInputRef.current?.showPicker();
-                    } catch {}
-                    startDateInputRef.current?.focus();
-                  }}
-                  className="w-[145px] sm:w-[155px] h-[42px] relative flex items-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-3.5 focus-within:ring-2 focus-within:ring-[#f472b6] cursor-pointer transition-all"
-                >
-                  <input
-                    ref={startDateInputRef}
-                    id="field-start-date"
-                    type="date"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    data-lpignore="true"
-                    data-form-type="other"
-                    required
-                    value={form.startDate}
-                    onChange={(e) => updateField('startDate', e.target.value)}
-                    className="w-full bg-transparent font-sans text-xs sm:text-sm font-bold text-foreground focus:outline-none cursor-pointer"
-                  />
+              {/* Extra Options: Image URL & Visibility */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div>
+                  <label htmlFor="field-image-url" className="block font-sans font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                    Image URL <span className="font-normal">(optional)</span>
+                  </label>
+                  <div className="relative flex items-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-3 py-1.5 focus-within:ring-2 focus-within:ring-[#f472b6] transition-all">
+                    <span className="mr-1.5 text-xs text-foreground/80 select-none">🖼️</span>
+                    <input
+                      id="field-image-url"
+                      type="url"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                      data-lpignore="true"
+                      data-form-type="other"
+                      value={form.imageUrl}
+                      onChange={(e) => updateField('imageUrl', e.target.value)}
+                      placeholder="https://..."
+                      className="w-full bg-transparent text-xs sm:text-sm font-semibold text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Start time (Single clock icon, clicks open time picker) */}
-              <div>
-                <label htmlFor="field-start-time" className="block font-sans font-bold text-sm sm:text-base text-foreground mb-1.5">
-                  Start time
-                </label>
-                <div
-                  onClick={() => {
-                    try {
-                      startTimeInputRef.current?.showPicker();
-                    } catch {}
-                    startTimeInputRef.current?.focus();
-                  }}
-                  className="w-[145px] sm:w-[155px] h-[42px] relative flex items-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-3.5 focus-within:ring-2 focus-within:ring-[#f472b6] cursor-pointer transition-all"
-                >
-                  <input
-                    ref={startTimeInputRef}
-                    id="field-start-time"
-                    type="time"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    data-lpignore="true"
-                    data-form-type="other"
-                    required
-                    value={form.startTime}
-                    onChange={(e) => updateField('startTime', e.target.value)}
-                    className="w-full bg-transparent font-sans text-xs sm:text-sm font-bold text-foreground focus:outline-none cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              {/* Start day */}
-              <div>
-                <span className="block font-sans font-bold text-sm sm:text-base text-foreground mb-1.5">
-                  Start day
-                </span>
-                <div className="w-[120px] sm:w-[130px] h-[42px] flex items-center justify-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-3 font-sans font-bold text-xs sm:text-sm text-foreground select-none">
-                  {startWeekday || '—'}
+                <div>
+                  <span className="block font-sans font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                    Visibility
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => updateField('visibility', 'published')}
+                      className={`flex-1 rounded-full border-2 border-foreground py-1.5 px-2.5 text-xs font-bold transition-all active:translate-y-0.5 cursor-pointer ${
+                        form.visibility === 'published'
+                          ? 'bg-[#bbf7d0] text-foreground shadow-[2px_2px_0_0_#4a2835]'
+                          : 'bg-[#fdf2f6] text-muted-foreground hover:bg-[#dcfce7] hover:text-foreground'
+                      }`}
+                    >
+                      🌿 Published
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateField('visibility', 'draft')}
+                      className={`flex-1 rounded-full border-2 border-foreground py-1.5 px-2.5 text-xs font-bold transition-all active:translate-y-0.5 cursor-pointer ${
+                        form.visibility === 'draft'
+                          ? 'bg-[#fbcfe8] text-foreground shadow-[2px_2px_0_0_#4a2835]'
+                          : 'bg-[#fdf2f6] text-muted-foreground hover:bg-[#fbcfe8]/40 hover:text-foreground'
+                      }`}
+                    >
+                      📝 Draft
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* ROW 4: End date + End time + End day (Shorter Compact Pills) */}
-            <div className="flex flex-wrap items-end gap-3 sm:gap-4">
-              {/* End date */}
-              <div>
-                <label htmlFor="field-end-date" className="block font-sans font-bold text-sm sm:text-base text-foreground mb-1.5">
-                  End date
-                </label>
-                <div
-                  onClick={() => {
-                    try {
-                      endDateInputRef.current?.showPicker();
-                    } catch {}
-                    endDateInputRef.current?.focus();
-                  }}
-                  className="w-[145px] sm:w-[155px] h-[42px] relative flex items-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-3.5 focus-within:ring-2 focus-within:ring-[#f472b6] cursor-pointer transition-all"
-                >
-                  <input
-                    ref={endDateInputRef}
-                    id="field-end-date"
-                    type="date"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    data-lpignore="true"
-                    data-form-type="other"
-                    required
-                    value={form.endDate}
-                    onChange={(e) => updateField('endDate', e.target.value)}
-                    className="w-full bg-transparent font-sans text-xs sm:text-sm font-bold text-foreground focus:outline-none cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              {/* End time (Single clock icon, clicks open time picker) */}
-              <div>
-                <label htmlFor="field-end-time" className="block font-sans font-bold text-sm sm:text-base text-foreground mb-1.5">
-                  End time
-                </label>
-                <div
-                  onClick={() => {
-                    try {
-                      endTimeInputRef.current?.showPicker();
-                    } catch {}
-                    endTimeInputRef.current?.focus();
-                  }}
-                  className="w-[145px] sm:w-[155px] h-[42px] relative flex items-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-3.5 focus-within:ring-2 focus-within:ring-[#f472b6] cursor-pointer transition-all"
-                >
-                  <input
-                    ref={endTimeInputRef}
-                    id="field-end-time"
-                    type="time"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    data-lpignore="true"
-                    data-form-type="other"
-                    required
-                    value={form.endTime}
-                    onChange={(e) => updateField('endTime', e.target.value)}
-                    className="w-full bg-transparent font-sans text-xs sm:text-sm font-bold text-foreground focus:outline-none cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              {/* End day */}
-              <div>
-                <span className="block font-sans font-bold text-sm sm:text-base text-foreground mb-1.5">
-                  End day
-                </span>
-                <div className="w-[120px] sm:w-[130px] h-[42px] flex items-center justify-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-3 font-sans font-bold text-xs sm:text-sm text-foreground select-none">
-                  {endWeekday || '—'}
-                </div>
-              </div>
-            </div>
-
-            {validation.errors.endDate && (
-              <p role="alert" className="pl-4 text-xs font-bold text-rose-600">
-                ⚠️ {validation.errors.endDate}
-              </p>
-            )}
-
-            {/* ROW 5: Event details */}
-            <div>
-              <label htmlFor="field-details" className="block font-sans font-bold text-sm sm:text-base text-foreground mb-1.5">
-                Event details
-              </label>
-              <textarea
-                id="field-details"
-                rows={4}
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck={false}
-                data-lpignore="true"
-                data-form-type="other"
-                value={form.details}
-                onChange={(e) => updateField('details', e.target.value)}
-                placeholder="Write down the cozy event description, activities, or guidelines..."
-                className="w-full rounded-2xl sm:rounded-3xl border-2 border-foreground bg-[#fdf2f6] p-4 text-sm sm:text-base font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all resize-y min-h-[110px]"
-              />
-            </div>
-
-            {/* Extra Options: Image URL & Visibility (with comfy green and tulip pink styling) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 pt-1">
-              <div>
-                <label htmlFor="field-image-url" className="block font-sans font-bold text-sm text-foreground mb-1.5">
-                  Event image <span className="text-xs font-normal text-muted-foreground">(optional URL)</span>
-                </label>
-                <div className="relative flex items-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-4 py-2 focus-within:ring-2 focus-within:ring-[#f472b6] transition-all">
-                  <span className="mr-2 text-foreground/80 select-none">🖼️</span>
-                  <input
-                    id="field-image-url"
-                    type="url"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    spellCheck={false}
-                    data-lpignore="true"
-                    data-form-type="other"
-                    value={form.imageUrl}
-                    onChange={(e) => updateField('imageUrl', e.target.value)}
-                    placeholder="https://... (image URL)"
-                    className="w-full bg-transparent text-sm font-semibold text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <span className="block font-sans font-bold text-sm text-foreground mb-1.5">
-                  Visibility
-                </span>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => updateField('visibility', 'published')}
-                    className={`flex-1 rounded-full border-2 border-foreground py-2 px-3 text-xs sm:text-sm font-bold transition-all active:translate-y-0.5 cursor-pointer ${
-                      form.visibility === 'published'
-                        ? 'bg-[#bbf7d0] text-foreground shadow-[2px_2px_0_0_#4a2835]'
-                        : 'bg-[#fdf2f6] text-muted-foreground hover:bg-[#dcfce7] hover:text-foreground'
-                    }`}
-                  >
-                    🌿 Published
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => updateField('visibility', 'draft')}
-                    className={`flex-1 rounded-full border-2 border-foreground py-2 px-3 text-xs sm:text-sm font-bold transition-all active:translate-y-0.5 cursor-pointer ${
-                      form.visibility === 'draft'
-                        ? 'bg-[#fbcfe8] text-foreground shadow-[2px_2px_0_0_#4a2835]'
-                        : 'bg-[#fdf2f6] text-muted-foreground hover:bg-[#fbcfe8]/40 hover:text-foreground'
-                    }`}
-                  >
-                    📝 Draft
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Actions: "💾 Save event" matching screenshot */}
-          <div className="mt-8 flex flex-wrap items-center gap-3 pt-4 border-t-2 border-dashed border-foreground/20">
-            <button
-              type="submit"
-              disabled={isSubmitting || !validation.isValid}
-              className="flex items-center gap-2 rounded-xl border-2 border-foreground bg-[#f48fb1] hover:bg-[#f06292] px-6 py-2.5 font-sans font-bold text-sm sm:text-base text-foreground shadow-[3px_3px_0_0_#4a2835] active:translate-y-0.5 active:shadow-[1px_1px_0_0_#4a2835] disabled:opacity-50 transition-all cursor-pointer select-none"
-            >
-              <span className="text-base">💾</span>
-              <span>Save event</span>
-            </button>
-
-            {currentEvent && (
+            {/* Bottom Actions */}
+            <div className="mt-6 flex flex-wrap items-center gap-2.5 pt-4 border-t-2 border-dashed border-foreground/20">
               <button
-                type="button"
-                onClick={handleSaveAsNew}
+                type="submit"
                 disabled={isSubmitting || !validation.isValid}
-                className="flex items-center gap-1.5 rounded-xl border-2 border-foreground bg-[#bbf7d0] hover:bg-[#86efac] px-4 py-2.5 font-sans font-bold text-xs sm:text-sm text-foreground shadow-[3px_3px_0_0_#4a2835] active:translate-y-0.5 disabled:opacity-50 transition-all cursor-pointer select-none"
+                className="flex items-center gap-1.5 rounded-xl border-2 border-foreground bg-[#f48fb1] hover:bg-[#f06292] px-5 py-2 font-sans font-bold text-xs sm:text-sm text-foreground shadow-[2px_2px_0_0_#4a2835] active:translate-y-0.5 active:shadow-none disabled:opacity-50 transition-all cursor-pointer select-none"
               >
-                <span>📋</span>
-                <span>Save as new</span>
+                <span>💾</span>
+                <span>Save event</span>
               </button>
-            )}
 
-            <button
-              type="button"
-              onClick={handleReset}
-              disabled={!isDirty}
-              className="flex items-center gap-1 rounded-xl border-2 border-foreground/40 bg-card hover:bg-[#fdf2f6] px-4 py-2.5 font-sans font-bold text-xs sm:text-sm text-foreground active:translate-y-0.5 disabled:opacity-40 transition-all cursor-pointer"
-            >
-              <span>↺</span>
-              <span>Reset</span>
-            </button>
+              {currentEvent && (
+                <button
+                  type="button"
+                  onClick={handleSaveAsNew}
+                  disabled={isSubmitting || !validation.isValid}
+                  className="flex items-center gap-1.5 rounded-xl border-2 border-foreground bg-[#bbf7d0] hover:bg-[#86efac] px-3.5 py-2 font-sans font-bold text-xs text-foreground shadow-[2px_2px_0_0_#4a2835] active:translate-y-0.5 disabled:opacity-50 transition-all cursor-pointer select-none"
+                >
+                  <span>📋</span>
+                  <span>Save as new</span>
+                </button>
+              )}
 
-            {currentEvent && (
               <button
                 type="button"
-                onClick={() => setConfirmDelete(true)}
-                className="ml-auto flex items-center gap-1 rounded-xl border-2 border-rose-400 bg-rose-50 hover:bg-rose-100 px-4 py-2.5 font-sans font-bold text-xs sm:text-sm text-rose-700 shadow-[2px_2px_0_0_#f43f5e] active:translate-y-0.5 transition-all cursor-pointer"
+                onClick={handleReset}
+                disabled={!isDirty}
+                className="flex items-center gap-1 rounded-xl border-2 border-foreground/40 bg-card hover:bg-[#fdf2f6] px-3.5 py-2 font-sans font-bold text-xs text-foreground active:translate-y-0.5 disabled:opacity-40 transition-all cursor-pointer"
               >
-                <span>🗑️</span>
-                <span>Delete</span>
+                <span>↺</span>
+                <span>Reset</span>
               </button>
-            )}
-          </div>
-        </form>
+
+              {currentEvent && (
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(true)}
+                  className="ml-auto flex items-center gap-1 rounded-xl border-2 border-rose-400 bg-rose-50 hover:bg-rose-100 px-3 py-2 font-sans font-bold text-xs text-rose-700 shadow-[2px_2px_0_0_#f43f5e] active:translate-y-0.5 transition-all cursor-pointer"
+                >
+                  <span>🗑️</span>
+                  <span>Delete</span>
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
       </div>
 
       {/* Collapsible Developer & Timezone Inspector */}
-      <div className="mt-6 flex flex-col items-center">
+      <div className="mt-6 flex flex-col items-start" style={{ maxWidth: '560px', width: '100%' }}>
         <button
           type="button"
           onClick={() => setShowDevPanel(!showDevPanel)}

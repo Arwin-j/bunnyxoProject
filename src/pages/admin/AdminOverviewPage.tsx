@@ -119,59 +119,75 @@ export const AdminOverviewPage: React.FC = () => {
         </Link>
       </div>
 
-      {/* Summary Counters: Live, Upcoming, Ended */}
-      <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="sticker rounded-xl border-[3px] border-foreground bg-card p-4 shadow-[3px_3px_0_var(--mint)]">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+      {/* Summary Counters: Live, Upcoming, Ended (Shrunk to match content) */}
+      <section className="mt-6 flex flex-wrap items-center gap-3">
+        {/* status.live */}
+        <div
+          className="rounded-2xl border-2 border-[#e9b3ad] bg-[#f3ecda] px-4 py-2.5 shadow-xs"
+          style={{ width: 'fit-content', minWidth: '160px' }}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#8c6f55]">
               status.live
             </span>
-            <span className="inline-block size-3 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="inline-block size-2.5 rounded-full bg-emerald-500 animate-pulse" />
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-foreground">{counters.live}</span>
-            <span className="text-xs text-muted-foreground">in session now</span>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-2xl font-extrabold text-[#6b4f35] font-heading">{counters.live}</span>
+            <span className="text-xs text-[#8c6f55] font-sans">in session</span>
           </div>
         </div>
 
-        <div className="sticker rounded-xl border-[3px] border-foreground bg-card p-4 shadow-[3px_3px_0_var(--sky)]">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {/* status.upcoming */}
+        <div
+          className="rounded-2xl border-2 border-[#e9b3ad] bg-[#f3ecda] px-4 py-2.5 shadow-xs"
+          style={{ width: 'fit-content', minWidth: '160px' }}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#8c6f55]">
               status.upcoming
             </span>
-            <span className="font-mono text-xs text-sky-700 font-bold">NEXT</span>
+            <span className="font-mono text-[10px] text-sky-700 font-bold bg-sky-100 px-1.5 py-0.5 rounded-full">
+              NEXT
+            </span>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-foreground">{counters.upcoming}</span>
-            <span className="text-xs text-muted-foreground">scheduled ahead</span>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-2xl font-extrabold text-[#6b4f35] font-heading">{counters.upcoming}</span>
+            <span className="text-xs text-[#8c6f55] font-sans">scheduled</span>
           </div>
         </div>
 
-        <div className="sticker rounded-xl border-[3px] border-foreground bg-card p-4 shadow-[3px_3px_0_var(--muted)]">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {/* status.ended */}
+        <div
+          className="rounded-2xl border-2 border-[#e9b3ad] bg-[#f3ecda] px-4 py-2.5 shadow-xs"
+          style={{ width: 'fit-content', minWidth: '160px' }}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#8c6f55]">
               status.ended
             </span>
-            <span className="font-mono text-xs text-muted-foreground">ARCHIVED</span>
+            <span className="font-mono text-[10px] text-[#8c6f55] font-semibold bg-[#e9dcc5] px-1.5 py-0.5 rounded-full">
+              PAST
+            </span>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-foreground">{counters.ended}</span>
-            <span className="text-xs text-muted-foreground">past events</span>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-2xl font-extrabold text-[#6b4f35] font-heading">{counters.ended}</span>
+            <span className="text-xs text-[#8c6f55] font-sans">archived</span>
           </div>
         </div>
       </section>
 
-      {/* Events Table Section */}
+      {/* Events Section */}
       <section className="mt-8">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-xl font-bold tracking-tight">Events</h2>
-          <span className="font-mono text-xs text-muted-foreground">
+          <h2 className="text-xl font-bold tracking-tight text-[#6b4f35] font-heading">Events</h2>
+          <span className="font-mono text-xs text-[#8c6f55]">
             Showing {filteredEvents.length} of {events.length}
           </span>
         </div>
 
         {/* Filter Toolbar */}
-        <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border-2 border-foreground/30 bg-muted/40 p-3">
+        <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border-2 border-[#e9b3ad] bg-[#f3ecda] p-3 shadow-xs">
           <div className="flex-1 min-w-[200px]">
             <input
               type="search"
@@ -184,7 +200,7 @@ export const AdminOverviewPage: React.FC = () => {
               placeholder="Search by title, location, ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg border-2 border-foreground/30 bg-background px-3 py-1.5 font-mono text-xs sm:text-sm focus:border-foreground focus:outline-none"
+              className="w-full rounded-xl border border-[#e9b3ad] bg-white px-3 py-1.5 font-sans text-xs sm:text-sm text-[#6b4f35] placeholder:text-[#8c6f55]/60 focus:outline-none focus:ring-2 focus:ring-[#b23a6b]"
             />
           </div>
 
@@ -193,7 +209,7 @@ export const AdminOverviewPage: React.FC = () => {
               value={platformFilter}
               onChange={(e) => setPlatformFilter(e.target.value)}
               aria-label="Filter by platform"
-              className="rounded-lg border-2 border-foreground/30 bg-background px-2.5 py-1.5 font-mono text-xs sm:text-sm focus:border-foreground focus:outline-none cursor-pointer"
+              className="rounded-xl border border-[#e9b3ad] bg-white px-2.5 py-1.5 font-sans text-xs sm:text-sm text-[#6b4f35] focus:outline-none focus:ring-2 focus:ring-[#b23a6b] cursor-pointer"
             >
               <option value="all">Platform: All</option>
               {Object.entries(PLATFORM_CONFIG).map(([key, meta]) => (
@@ -207,7 +223,7 @@ export const AdminOverviewPage: React.FC = () => {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               aria-label="Filter by time status"
-              className="rounded-lg border-2 border-foreground/30 bg-background px-2.5 py-1.5 font-mono text-xs sm:text-sm focus:border-foreground focus:outline-none cursor-pointer"
+              className="rounded-xl border border-[#e9b3ad] bg-white px-2.5 py-1.5 font-sans text-xs sm:text-sm text-[#6b4f35] focus:outline-none focus:ring-2 focus:ring-[#b23a6b] cursor-pointer"
             >
               <option value="all">Status: All</option>
               <option value="live">🟢 Live</option>
@@ -219,7 +235,7 @@ export const AdminOverviewPage: React.FC = () => {
               value={visibilityFilter}
               onChange={(e) => setVisibilityFilter(e.target.value)}
               aria-label="Filter by visibility"
-              className="rounded-lg border-2 border-foreground/30 bg-background px-2.5 py-1.5 font-mono text-xs sm:text-sm focus:border-foreground focus:outline-none cursor-pointer"
+              className="rounded-xl border border-[#e9b3ad] bg-white px-2.5 py-1.5 font-sans text-xs sm:text-sm text-[#6b4f35] focus:outline-none focus:ring-2 focus:ring-[#b23a6b] cursor-pointer"
             >
               <option value="all">Visibility: All</option>
               <option value="published">✅ Published</option>
@@ -238,7 +254,7 @@ export const AdminOverviewPage: React.FC = () => {
                   setVisibilityFilter('all');
                   setSearchQuery('');
                 }}
-                className="cursor-pointer rounded-lg border border-foreground/30 px-2.5 py-1 font-mono text-xs hover:bg-card"
+                className="cursor-pointer rounded-xl border border-[#e9b3ad] bg-white px-2.5 py-1 font-sans text-xs font-semibold text-[#6b4f35] hover:bg-[#fbd5e1]/40 transition-colors"
               >
                 Reset filters
               </button>
@@ -246,84 +262,52 @@ export const AdminOverviewPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Dense Table */}
-        <div className="overflow-x-auto rounded-xl border-[3px] border-foreground bg-card shadow-sm">
-          <table className="w-full min-w-[760px] text-left text-xs sm:text-sm">
-            <thead className="border-b-2 border-foreground bg-accent/60 font-mono text-xs text-foreground">
-              <tr>
-                <th className="px-3 py-3 font-bold">id</th>
-                <th className="px-3 py-3 font-bold">title</th>
-                <th className="px-3 py-3 font-bold">platform</th>
-                <th className="px-3 py-3 font-bold">location</th>
-                <th className="px-3 py-3 font-bold">date</th>
-                <th className="px-3 py-3 font-bold">time</th>
-                <th className="px-3 py-3 font-bold">day</th>
-                <th className="px-3 py-3 font-bold">status</th>
-                <th className="px-3 py-3 font-bold">visibility</th>
-                <th className="px-3 py-3 font-bold text-right">actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-foreground/15 font-sans">
-              {loading ? (
-                <tr>
-                  <td colSpan={10} className="p-8 text-center font-mono text-muted-foreground">
-                    Loading events data...
-                  </td>
-                </tr>
-              ) : filteredEvents.length === 0 ? (
-                <tr>
-                  <td colSpan={10} className="p-8 text-center font-mono text-muted-foreground">
-                    {events.length === 0 ? 'No events yet.' : 'No events match your search criteria.'}
-                  </td>
-                </tr>
-              ) : (
-                filteredEvents.map((ev) => {
-                  const status = getEventStatus(ev, now);
-                  const isLive = status === 'live';
-                  const isUpcoming = status === 'upcoming';
-                  const isEnded = status === 'ended';
+        {/* List of Events remade as Content-Shrunk Boxes */}
+        {loading ? (
+          <div
+            className="rounded-2xl border-2 border-[#e9b3ad] bg-[#f3ecda] p-6 text-center text-[#8c6f55]"
+            style={{ width: 'fit-content', minWidth: '240px' }}
+          >
+            <span className="font-mono text-xs">Loading events...</span>
+          </div>
+        ) : filteredEvents.length === 0 ? (
+          <div
+            className="rounded-2xl border-2 border-[#e9b3ad] bg-[#f3ecda] p-6 text-center text-[#8c6f55]"
+            style={{ width: 'fit-content', minWidth: '260px' }}
+          >
+            <span className="text-2xl block mb-1">🌸</span>
+            <p className="font-heading font-bold text-sm text-[#6b4f35]">No events found</p>
+            <p className="text-xs text-[#8c6f55] mt-1 font-sans">
+              {events.length === 0
+                ? 'All events have been deleted.'
+                : 'No events match your search criteria.'}
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-4">
+            {filteredEvents.map((ev) => {
+              const status = getEventStatus(ev, now);
+              const isLive = status === 'live';
+              const isUpcoming = status === 'upcoming';
 
-                  return (
-                    <tr
-                      key={ev.id}
-                      className="hover:bg-accent/20 transition-colors"
-                    >
-                      <td className="px-3 py-3 font-mono text-xs text-muted-foreground" title={ev.id}>
-                        {ev.id.slice(0, 8)}…
-                      </td>
-
-                      <td className="px-3 py-3 font-semibold max-w-[200px] truncate" title={ev.title}>
-                        {ev.title}
-                      </td>
-
-                      <td className="px-3 py-3">
-                        <PlatformChip platform={ev.platform} className="text-xs px-2 py-0.5" />
-                      </td>
-
-                      <td className="px-3 py-3 max-w-[150px] truncate text-muted-foreground" title={ev.location}>
-                        {ev.location}
-                      </td>
-
-                      <td className="px-3 py-3 whitespace-nowrap font-mono text-xs">
-                        {formatDateOnly(ev.starts_at)}
-                      </td>
-
-                      <td className="px-3 py-3 whitespace-nowrap font-mono text-xs text-muted-foreground">
-                        {formatTimeOnly(ev.starts_at)} - {formatTimeOnly(ev.ends_at)}
-                      </td>
-
-                      <td className="px-3 py-3 whitespace-nowrap font-mono text-xs">
-                        {getWeekdayName(ev.starts_at)}
-                      </td>
-
-                      <td className="px-3 py-3 whitespace-nowrap">
+              return (
+                <div
+                  key={ev.id}
+                  className="rounded-2xl border-2 border-[#e9b3ad] bg-[#f3ecda] p-4 shadow-xs flex flex-col justify-between transition-transform hover:-translate-y-0.5"
+                  style={{ width: 'fit-content', minWidth: '260px', maxWidth: '340px' }}
+                >
+                  {/* Top row: Platform chip & Status badge */}
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <PlatformChip platform={ev.platform} className="text-[11px] px-2 py-0.5" />
+                      <div className="flex items-center gap-1.5">
                         <span
-                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-mono text-[11px] font-bold border ${
+                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-mono text-[10px] font-bold border ${
                             isLive
                               ? 'bg-emerald-100 text-emerald-800 border-emerald-400'
                               : isUpcoming
                               ? 'bg-sky-100 text-sky-800 border-sky-400'
-                              : 'bg-muted text-muted-foreground border-foreground/20'
+                              : 'bg-stone-200 text-stone-600 border-stone-300'
                           }`}
                         >
                           <span
@@ -332,52 +316,76 @@ export const AdminOverviewPage: React.FC = () => {
                                 ? 'bg-emerald-500 animate-pulse'
                                 : isUpcoming
                                 ? 'bg-sky-500'
-                                : 'bg-gray-400'
+                                : 'bg-stone-400'
                             }`}
                           />
                           {status.toUpperCase()}
                         </span>
-                      </td>
-
-                      <td className="px-3 py-3 whitespace-nowrap">
                         <span
-                          className={`rounded-full px-2 py-0.5 font-mono text-[11px] font-semibold border ${
+                          className={`rounded-full px-1.5 py-0.5 font-mono text-[9px] font-semibold border ${
                             ev.visibility === 'published'
-                              ? 'bg-mint/80 border-foreground/30 text-foreground'
-                              : 'bg-butter/80 border-foreground/30 text-foreground'
+                              ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
+                              : 'bg-amber-50 border-amber-300 text-amber-700'
                           }`}
                         >
                           {ev.visibility}
                         </span>
-                      </td>
+                      </div>
+                    </div>
 
-                      <td className="px-3 py-3 whitespace-nowrap text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => navigate(`/admin/edit?id=${ev.id}`)}
-                            title={`Edit ${ev.title}`}
-                            className="cursor-pointer rounded-lg border border-foreground/30 bg-background px-2.5 py-1 text-xs font-mono font-semibold hover:bg-accent transition-colors active:translate-y-0.5"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setDeletingEvent(ev)}
-                            title={`Delete ${ev.title}`}
-                            className="cursor-pointer rounded-lg border border-foreground/30 bg-background px-2 py-1 text-xs font-mono text-rose-700 hover:bg-rose-100 hover:border-rose-400 transition-colors active:translate-y-0.5"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                    {/* Title */}
+                    <h3
+                      className="font-heading font-bold text-base text-[#6b4f35] leading-snug line-clamp-2"
+                      title={ev.title}
+                    >
+                      {ev.title}
+                    </h3>
+
+                    {/* Location */}
+                    <p className="text-xs text-[#8c6f55] mt-1 flex items-center gap-1 font-sans">
+                      <span>📍</span>
+                      <span className="truncate">{ev.location}</span>
+                    </p>
+
+                    {/* Date & Time */}
+                    <div className="mt-2 text-[11px] font-mono text-[#8c6f55] bg-white/70 rounded-xl p-2 border border-[#e9b3ad]/40 space-y-0.5">
+                      <div>
+                        📅 {formatDateOnly(ev.starts_at)} ({getWeekdayName(ev.starts_at)})
+                      </div>
+                      <div>
+                        🕒 {formatTimeOnly(ev.starts_at)} – {formatTimeOnly(ev.ends_at)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom Actions */}
+                  <div className="mt-3 pt-3 border-t border-[#e9b3ad]/40 flex items-center justify-between gap-2">
+                    <span className="font-mono text-[10px] text-[#8c6f55]" title={ev.id}>
+                      {ev.id.slice(0, 8)}…
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/admin/edit?id=${ev.id}`)}
+                        className="cursor-pointer rounded-xl border border-[#e9b3ad] bg-white px-3 py-1 text-xs font-heading font-bold text-[#b23a6b] hover:bg-[#fbd5e1]/40 transition-colors active:translate-y-0.5"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeletingEvent(ev)}
+                        className="cursor-pointer rounded-xl border border-rose-300 bg-white px-2.5 py-1 text-xs font-mono font-bold text-rose-700 hover:bg-rose-50 transition-colors active:translate-y-0.5"
+                        title="Delete event"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* Delete Confirmation Modal */}

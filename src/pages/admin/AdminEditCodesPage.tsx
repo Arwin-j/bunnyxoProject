@@ -179,7 +179,7 @@ export const AdminEditCodesPage: React.FC = () => {
       <AdminEditTabs currentTab="codes" />
 
       {/* Top Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4" style={{ maxWidth: '560px', width: '100%' }}>
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground font-sans flex items-center gap-2">
             <span>Edit Redemption Codes</span>
@@ -207,24 +207,24 @@ export const AdminEditCodesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 1. Form to Paste in Title, Code, and Expiry Date */}
-      <section className="rounded-[28px] border-[3px] border-foreground bg-card p-6 sm:p-7 shadow-ink space-y-5">
-        <div className="border-b-2 border-dashed border-foreground/30 pb-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">✏️</span>
-            <h2 className="text-xl sm:text-2xl font-bold text-foreground font-sans">
-              {editingCodeId ? 'Edit Redemption Code' : 'Add Redemption Code'}
-            </h2>
+      {/* 1. Form to Paste in Title, Code, and Expiry Date (Compact, content-matched box) */}
+      <div style={{ maxWidth: '560px', width: '100%' }}>
+        <section className="rounded-[28px] border-[3px] border-foreground bg-card p-5 sm:p-6 shadow-ink space-y-4">
+          <div className="border-b-2 border-dashed border-foreground/30 pb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">✏️</span>
+              <h2 className="text-xl font-bold text-foreground font-sans">
+                {editingCodeId ? 'Edit Redemption Code' : 'Add Redemption Code'}
+              </h2>
+            </div>
+            {editingCodeId && (
+              <span className="rounded-full border border-foreground bg-amber-200 px-2.5 py-0.5 text-xs font-bold text-amber-950">
+                Editing mode
+              </span>
+            )}
           </div>
-          {editingCodeId && (
-            <span className="rounded-full border border-foreground bg-amber-200 px-3 py-0.5 text-xs font-bold text-amber-950">
-              Editing mode
-            </span>
-          )}
-        </div>
 
-        <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} autoComplete="off" className="space-y-3.5">
             {/* Title Input */}
             <div>
               <label
@@ -251,34 +251,54 @@ export const AdminEditCodesPage: React.FC = () => {
               />
             </div>
 
-            {/* Code Input */}
-            <div>
-              <label
-                htmlFor="code-code-input"
-                className="block font-sans font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1.5"
-              >
-                Code (paste code here) <span className="text-rose-500">*</span>
-              </label>
-              <input
-                id="code-code-input"
-                type="text"
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck={false}
-                data-lpignore="true"
-                data-form-type="other"
-                required
-                maxLength={40}
-                value={form.code}
-                onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                placeholder="e.g. HEARTOPIA2026"
-                className="w-full rounded-full border-2 border-foreground bg-[#fdf2f6] px-4 py-2 font-mono font-bold text-sm text-foreground uppercase placeholder:normal-case placeholder:font-sans placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all"
-              />
-            </div>
-          </div>
+            {/* Code Input & Status */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label
+                  htmlFor="code-code-input"
+                  className="block font-sans font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1.5"
+                >
+                  Code (paste code here) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  id="code-code-input"
+                  type="text"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-form-type="other"
+                  required
+                  maxLength={40}
+                  value={form.code}
+                  onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
+                  placeholder="e.g. HEARTOPIA2026"
+                  className="w-full rounded-full border-2 border-foreground bg-[#fdf2f6] px-4 py-2 font-mono font-bold text-sm text-foreground uppercase placeholder:normal-case placeholder:font-sans placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all"
+                />
+              </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="code-status-select"
+                  className="block font-sans font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1.5"
+                >
+                  Category / Status
+                </label>
+                <select
+                  id="code-status-select"
+                  value={form.isHistory ? 'history' : 'active'}
+                  onChange={(e) =>
+                    setForm({ ...form, isHistory: e.target.value === 'history' })
+                  }
+                  className="w-full rounded-full border-2 border-foreground bg-[#fdf2f6] px-4 py-2 font-sans font-bold text-xs sm:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all cursor-pointer"
+                >
+                  <option value="active">Active Code (Feed)</option>
+                  <option value="history">History Code (Expired)</option>
+                </select>
+              </div>
+            </div>
+
             {/* Expiry Date Input with Calendar Pop-up & Permanent Button on the side */}
             <div>
               <label
@@ -293,10 +313,10 @@ export const AdminEditCodesPage: React.FC = () => {
                 {isPermanent ? (
                   <div
                     onClick={handleTogglePermanent}
-                    className="flex-1 h-[42px] flex items-center justify-between rounded-full border-2 border-[#166534] bg-[#dcfce7] px-4 text-sm font-bold text-[#14532d] shadow-xs cursor-pointer select-none"
+                    className="flex-1 h-[40px] flex items-center justify-between rounded-full border-2 border-[#166534] bg-[#dcfce7] px-4 text-xs sm:text-sm font-bold text-[#14532d] shadow-xs cursor-pointer select-none"
                     title="Currently permanent. Click to choose a date."
                   >
-                    <span>♾️ Permanent (No Expiration)</span>
+                    <span>♾️ Permanent (No Expiry)</span>
                     <span className="text-xs text-[#166534]/70 hover:underline">
                       ✕
                     </span>
@@ -309,7 +329,7 @@ export const AdminEditCodesPage: React.FC = () => {
                       } catch {}
                       dateInputRef.current?.focus();
                     }}
-                    className="flex-1 h-[42px] relative flex items-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-4 focus-within:ring-2 focus-within:ring-[#f472b6] cursor-pointer transition-all"
+                    className="flex-1 h-[40px] relative flex items-center rounded-full border-2 border-foreground bg-[#fdf2f6] px-4 focus-within:ring-2 focus-within:ring-[#f472b6] cursor-pointer transition-all"
                   >
                     <input
                       ref={dateInputRef}
@@ -328,7 +348,7 @@ export const AdminEditCodesPage: React.FC = () => {
                           (e.target as HTMLInputElement).showPicker();
                         } catch {}
                       }}
-                      className="w-full bg-transparent font-sans font-bold text-sm text-foreground focus:outline-none cursor-pointer"
+                      className="w-full bg-transparent font-sans font-bold text-xs sm:text-sm text-foreground focus:outline-none cursor-pointer"
                     />
                   </div>
                 )}
@@ -342,7 +362,7 @@ export const AdminEditCodesPage: React.FC = () => {
                       ? 'Switch back to calendar date picker'
                       : 'Make code permanent with no expiration date'
                   }
-                  className={`h-[42px] shrink-0 rounded-full border-2 px-3.5 sm:px-4 font-sans text-xs sm:text-sm font-bold transition-all active:translate-y-0.5 cursor-pointer flex items-center gap-1.5 select-none ${
+                  className={`h-[40px] shrink-0 rounded-full border-2 px-3.5 font-sans text-xs sm:text-sm font-bold transition-all active:translate-y-0.5 cursor-pointer flex items-center gap-1.5 select-none ${
                     isPermanent
                       ? 'border-[#166534] bg-[#bbf7d0] text-[#14532d] shadow-ink'
                       : 'border-foreground/30 bg-card hover:bg-accent hover:border-foreground text-foreground shadow-xs'
@@ -360,73 +380,52 @@ export const AdminEditCodesPage: React.FC = () => {
               )}
             </div>
 
-            {/* Status: Active vs History */}
+            {/* Rewards (Optional) */}
             <div>
               <label
-                htmlFor="code-status-select"
+                htmlFor="code-rewards-input"
                 className="block font-sans font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1.5"
               >
-                Category / Status
+                Rewards Summary (Optional)
               </label>
-              <select
-                id="code-status-select"
-                value={form.isHistory ? 'history' : 'active'}
-                onChange={(e) =>
-                  setForm({ ...form, isHistory: e.target.value === 'history' })
-                }
-                className="w-full rounded-full border-2 border-foreground bg-[#fdf2f6] px-4 py-2 font-sans font-bold text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all cursor-pointer"
-              >
-                <option value="active">Active Code (Public Feed)</option>
-                <option value="history">History Code (Expired List)</option>
-              </select>
+              <input
+                id="code-rewards-input"
+                type="text"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-form-type="other"
+                maxLength={120}
+                value={form.rewards}
+                onChange={(e) => setForm({ ...form, rewards: e.target.value })}
+                placeholder="e.g. 150x Wishing Stars & Apron"
+                className="w-full rounded-full border-2 border-foreground bg-[#fdf2f6] px-4 py-2 font-sans font-bold text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all"
+              />
             </div>
-          </div>
 
-          {/* Rewards (Optional) */}
-          <div>
-            <label
-              htmlFor="code-rewards-input"
-              className="block font-sans font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1.5"
-            >
-              Rewards Summary (Optional)
-            </label>
-            <input
-              id="code-rewards-input"
-              type="text"
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="off"
-              spellCheck={false}
-              data-lpignore="true"
-              data-form-type="other"
-              maxLength={120}
-              value={form.rewards}
-              onChange={(e) => setForm({ ...form, rewards: e.target.value })}
-              placeholder="e.g. 150x Wishing Stars & Exclusive Tulip Apron"
-              className="w-full rounded-full border-2 border-foreground bg-[#fdf2f6] px-4 py-2 font-sans font-bold text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#f472b6] transition-all"
-            />
-          </div>
-
-          {/* Form Actions */}
-          <div className="pt-3 border-t-2 border-dashed border-foreground/20 flex flex-wrap items-center gap-3">
-            <button
-              type="submit"
-              className="rounded-xl border-2 border-foreground bg-[#f48fb1] hover:bg-[#f06292] py-2.5 px-6 font-sans font-bold text-sm text-foreground shadow-ink active:translate-y-0.5 transition-all cursor-pointer"
-            >
-              {editingCodeId ? '💾 Save Changes' : '✨ Publish Code'}
-            </button>
-            {editingCodeId && (
+            {/* Form Actions */}
+            <div className="pt-3 border-t-2 border-dashed border-foreground/20 flex flex-wrap items-center gap-2.5">
               <button
-                type="button"
-                onClick={handleResetForm}
-                className="rounded-xl border-2 border-foreground/40 bg-card hover:bg-muted py-2.5 px-4 font-sans font-semibold text-sm text-foreground transition-all cursor-pointer"
+                type="submit"
+                className="rounded-xl border-2 border-foreground bg-[#f48fb1] hover:bg-[#f06292] py-2 px-5 font-sans font-bold text-xs sm:text-sm text-foreground shadow-ink active:translate-y-0.5 transition-all cursor-pointer"
               >
-                Cancel Edit
+                {editingCodeId ? '💾 Save Changes' : '✨ Publish Code'}
               </button>
-            )}
-          </div>
-        </form>
-      </section>
+              {editingCodeId && (
+                <button
+                  type="button"
+                  onClick={handleResetForm}
+                  className="rounded-xl border-2 border-foreground/40 bg-card hover:bg-muted py-2 px-3.5 font-sans font-semibold text-xs sm:text-sm text-foreground transition-all cursor-pointer"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
+          </form>
+        </section>
+      </div>
 
       {/* 2. Active Codes Table / Card List */}
       <section className="space-y-4">

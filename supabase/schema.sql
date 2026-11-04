@@ -3,6 +3,11 @@
 -- Run this script in your Supabase Dashboard: SQL Editor -> New Query -> Run
 -- ==============================================================================
 
+-- QUICK TASK: REMOVE ALL PINS & EVENTS FROM DATABASE
+-- Run these queries in Supabase SQL Editor to clear all existing pins & events:
+TRUNCATE TABLE public.map_pins;
+TRUNCATE TABLE public.events;
+
 -- 1. EXTENSIONS
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -82,6 +87,17 @@ ALTER TABLE public.map_pins ADD COLUMN IF NOT EXISTS image TEXT;
 ALTER TABLE public.map_pins ADD COLUMN IF NOT EXISTS game TEXT DEFAULT 'heartopia';
 ALTER TABLE public.map_pins ADD COLUMN IF NOT EXISTS map_id TEXT DEFAULT 'island';
 
+-- E. COMMUNITY SPOTLIGHTS TABLE
+CREATE TABLE IF NOT EXISTS public.community_spotlights (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  username TEXT NOT NULL,
+  title TEXT NOT NULL,
+  image_url TEXT NOT NULL,
+  is_featured BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ==============================================================================
 -- 3. ROW LEVEL SECURITY (RLS) POLICIES
 -- ==============================================================================
@@ -91,6 +107,7 @@ ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.redemption_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.feed_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.map_pins ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.community_spotlights ENABLE ROW LEVEL SECURITY;
 
 -- 1) Public Read Access (Anyone can view events, codes, feed, and pins)
 CREATE POLICY "Public users can read events" ON public.events
@@ -105,13 +122,19 @@ CREATE POLICY "Public users can read feed posts" ON public.feed_posts
 CREATE POLICY "Public users can read map pins" ON public.map_pins
   FOR SELECT USING (true);
 
+CREATE POLICY "Public users can read community spotlights" ON public.community_spotlights
+  FOR SELECT USING (true);
+
+CREATE POLICY "Public users can submit community spotlights" ON public.community_spotlights
+  FOR INSERT WITH CHECK (true);
+
 -- 2) Admin Write Access (Only authenticated users can insert, update, or delete)
 CREATE POLICY "Admins can insert events" ON public.events
-  FOR INSERT TO authenticated WITH CHECK (true);
+  FOR INSERT WITH CHECK (true);
 CREATE POLICY "Admins can update events" ON public.events
-  FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+  FOR UPDATE USING (true) WITH CHECK (true);
 CREATE POLICY "Admins can delete events" ON public.events
-  FOR DELETE TO authenticated USING (true);
+  FOR DELETE USING (true);
 
 CREATE POLICY "Admins can insert codes" ON public.redemption_codes
   FOR INSERT TO authenticated WITH CHECK (true);
@@ -128,11 +151,16 @@ CREATE POLICY "Admins can delete feed posts" ON public.feed_posts
   FOR DELETE TO authenticated USING (true);
 
 CREATE POLICY "Admins can insert map pins" ON public.map_pins
-  FOR INSERT TO authenticated WITH CHECK (true);
+  FOR INSERT WITH CHECK (true);
 CREATE POLICY "Admins can update map pins" ON public.map_pins
-  FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+  FOR UPDATE USING (true) WITH CHECK (true);
 CREATE POLICY "Admins can delete map pins" ON public.map_pins
-  FOR DELETE TO authenticated USING (true);
+  FOR DELETE USING (true);
+
+CREATE POLICY "Admins can update community spotlights" ON public.community_spotlights
+  FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "Admins can delete community spotlights" ON public.community_spotlights
+  FOR DELETE USING (true);
 
 -- ==============================================================================
 -- 4. STORAGE BUCKETS CONFIGURATION
@@ -143,7 +171,8 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES 
   ('event-banners', 'event-banners', true),
   ('map-media', 'map-media', true),
-  ('feed-media', 'feed-media', true)
+  ('feed-media', 'feed-media', true),
+  ('community-spotlights', 'community-spotlights', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Storage RLS: Anyone can view images/media
@@ -155,6 +184,12 @@ CREATE POLICY "Public can view map media" ON storage.objects
 
 CREATE POLICY "Public can view feed media" ON storage.objects
   FOR SELECT USING (bucket_id = 'feed-media');
+
+CREATE POLICY "Public can view community spotlights media" ON storage.objects
+  FOR SELECT USING (bucket_id = 'community-spotlights');
+
+CREATE POLICY "Public can upload community spotlights media" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'community-spotlights');
 
 -- Storage RLS: Authenticated admins can upload media
 CREATE POLICY "Admins can upload event banners" ON storage.objects
@@ -169,15 +204,6 @@ CREATE POLICY "Admins can upload feed media" ON storage.objects
 -- ==============================================================================
 -- 5. INITIAL SEED DATA
 -- ==============================================================================
-
--- Initial Events
-INSERT INTO public.events (id, title, platform, location, starts_at, ends_at, details, prize, image_url, visibility, source)
-VALUES
-  ('1e8a937a-49cf-4ef8-a5f1-01b3ad852e01', 'Cozy Friday Picnic', 'heartopia', 'Blossom Meadow', NOW() - INTERVAL '2 hours', NOW() + INTERVAL '4 hours', 'Bring snacks, wear your comfiest outfit and hang out by the lake.', 'Strawberry Basket Decor', 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?w=600&auto=format&fit=crop&q=80', 'published', 'manual'),
-  ('1f9b848b-59df-4fa2-b6f2-02c4be963f02', 'Lofi Voice & Sketch Hangout', 'discord', 'Voice lounge', NOW() - INTERVAL '90 minutes', NOW() + INTERVAL '3.5 hours', 'Chilling in the voice lounge listening to relaxing lofi beats, sketching cozy art, and hanging out with the community.', 'Artist Bunny Role', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80', 'published', 'manual'),
-  ('1d7a737c-68ef-4eb3-c7e3-03d5cf854e03', 'Floating Garden Bloom Fest', 'petit_planet', 'Floating Observatory', NOW() - INTERVAL '45 minutes', NOW() + INTERVAL '2.5 hours', 'Special flower bloom festival on the floating observatory! Harvest glowing petals with fellow planet keepers.', 'Celestial Petal Crown', 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&auto=format&fit=crop&q=80', 'published', 'manual'),
-  ('2d7c826b-38be-4de7-94e0-f0a2bc741d02', 'Discord Movie Night', 'discord', '#cozy-cinema', NOW() + INTERVAL '27 hours', NOW() + INTERVAL '30 hours', 'Watching a Ghibli classic together with voice chat.', 'Popcorn Emote Pack', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80', 'published', 'manual')
-ON CONFLICT (id) DO NOTHING;
 
 -- Initial Redemption Codes
 INSERT INTO public.redemption_codes (id, code, title, rewards, expiry, is_history)

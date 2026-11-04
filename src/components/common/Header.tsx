@@ -6,7 +6,6 @@ import { useDiscordPresence } from '../../hooks/useDiscordPresence';
 const NAV_LINKS = [
   { to: '/events', label: 'Collection' },
   { to: '/map', label: 'Map' },
-  { to: '/updates', label: 'Games' },
   { to: '/codes', label: 'Codes' },
   { to: '/feed', label: 'Feed' },
   { to: '/about', label: 'About us' },
@@ -136,8 +135,6 @@ export const Header: React.FC = () => {
                 ? isCodesActive
                 : link.to === '/events'
                 ? location.pathname.startsWith('/events') || location.pathname.startsWith('/collection')
-                : link.to === '/updates'
-                ? location.pathname.startsWith('/updates') || location.pathname.startsWith('/games')
                 : location.pathname.startsWith(link.to);
 
             return (

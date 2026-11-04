@@ -2,23 +2,27 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { InteractivePin, DEFAULT_ISLAND_PINS, GameId, HeartopiaMapId } from '../types/map';
 
-const STORAGE_KEY = 'hh.interactive_pins.v5';
+const STORAGE_KEY = 'hh.interactive_pins.v6';
 
 export function useInteractivePins(
   selectedGame: GameId = 'heartopia',
   selectedMap: HeartopiaMapId = 'island'
 ) {
   const [pins, setPins] = useState<InteractivePin[]>(() => {
-    if (typeof window === 'undefined') return DEFAULT_ISLAND_PINS;
+    if (typeof window === 'undefined') return [];
     try {
+      // Clear previous versions
+      for (let i = 1; i <= 5; i++) {
+        localStorage.removeItem(`hh.interactive_pins.v${i}`);
+      }
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
-      return DEFAULT_ISLAND_PINS;
+      return [];
     } catch {
-      return DEFAULT_ISLAND_PINS;
+      return [];
     }
   });
 
@@ -57,31 +61,40 @@ export function useInteractivePins(
 
         if (!mounted) return;
         setLoading(false);
-        if (error || !data || data.length === 0) return;
+        if (error || !data || data.length === 0) {
+          return;
+        }
+
+        // Filter out legacy test pins
+        const legacyPinIds = new Set([
+          'pin_1793145615709_7298',
+          'pin_1793152627094_420',
+          'pin_1793156220299_2455',
+          'pin_1793157685887_9458',
+          'pin_1793157846976_7268',
+          'pin_1793157621460_3055',
+        ]);
 
         // Map Supabase rows into InteractivePin
-        const supabasePins: InteractivePin[] = data.map((item: any) => ({
-          id: item.id,
-          name: item.name || 'Unnamed Pin',
-          cat: item.cat || 'landmark',
-          subcat: item.subcat || '',
-          owned: Boolean(item.owned),
-          tags: Array.isArray(item.tags) ? item.tags : [],
-          desc: item.desc || item.description || '',
-          image: item.image || null,
-          x: Number(item.x) || 0,
-          y: Number(item.y) || 0,
-          game: (item.game as GameId) || 'heartopia',
-          mapId: (item.map_id as HeartopiaMapId) || 'island',
-          createdAt: item.created_at || new Date().toISOString(),
-        }));
+        const supabasePins: InteractivePin[] = data
+          .filter((item: any) => !legacyPinIds.has(item.id))
+          .map((item: any) => ({
+            id: item.id,
+            name: item.name || 'Unnamed Pin',
+            cat: item.cat || 'landmark',
+            subcat: item.subcat || '',
+            owned: Boolean(item.owned),
+            tags: Array.isArray(item.tags) ? item.tags : [],
+            desc: item.desc || item.description || '',
+            image: item.image || null,
+            x: Number(item.x) || 0,
+            y: Number(item.y) || 0,
+            game: (item.game as GameId) || 'heartopia',
+            mapId: (item.map_id as HeartopiaMapId) || 'island',
+            createdAt: item.created_at || new Date().toISOString(),
+          }));
 
-        setPins((prev) => {
-          // Merge: Keep pins that exist in prev or Supabase
-          const existingIds = new Set(supabasePins.map((p) => p.id));
-          const localOnly = prev.filter((p) => !existingIds.has(p.id));
-          return [...supabasePins, ...localOnly];
-        });
+        setPins(supabasePins);
       } catch {
         if (mounted) setLoading(false);
       }
@@ -181,12 +194,32 @@ export function useInteractivePins(
     [pins, updatePin]
   );
 
-  // Reset to default sample pins
+  // Reset to empty pins
   const resetPins = useCallback(() => {
-    setPins(DEFAULT_ISLAND_PINS);
+    setPins([]);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_ISLAND_PINS));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
     } catch {}
+    if (isSupabaseConfigured()) {
+      try {
+        supabase.from('map_pins').delete().neq('id', '').then(() => {});
+      } catch {}
+    }
+  }, []);
+
+  // Clear all pins
+  const clearAllPins = useCallback(async () => {
+    setPins([]);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+    } catch {}
+    if (isSupabaseConfigured()) {
+      try {
+        await supabase.from('map_pins').delete().neq('id', '');
+      } catch (err) {
+        console.warn('Supabase clear all pins warning:', err);
+      }
+    }
   }, []);
 
   // Bulk import
@@ -208,6 +241,7 @@ export function useInteractivePins(
     deletePin,
     toggleOwned,
     resetPins,
+    clearAllPins,
     importPins,
   };
 }

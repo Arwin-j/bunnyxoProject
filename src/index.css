@@ -162,12 +162,13 @@ body {
   padding: 18px;
   box-sizing: border-box;
   color: #6b4f35;
-  box-shadow: 0 4px 16px rgba(107, 79, 53, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(107, 79, 53, 0.05);
+  transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.22s ease;
 }
 
 .card:hover {
-  box-shadow: 0 6px 20px rgba(107, 79, 53, 0.12);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(107, 79, 53, 0.18), 0 4px 12px rgba(107, 79, 53, 0.1) !important;
 }
 
 .card h2 {
@@ -192,6 +193,13 @@ body {
   font-size: 13px;
   font-weight: 700;
   color: #6b4f35;
+  box-shadow: 0 2px 6px rgba(107, 79, 53, 0.05);
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease;
+}
+
+.ph:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(107, 79, 53, 0.22) !important;
 }
 
 .row {
@@ -205,6 +213,13 @@ body {
   margin-bottom: 8px;
   font-size: 14px;
   color: #6b4f35;
+  box-shadow: 0 1px 4px rgba(107, 79, 53, 0.03);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.row:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 18px rgba(107, 79, 53, 0.15) !important;
 }
 
 .btn {
@@ -296,13 +311,13 @@ body {
   padding: 14px;
   color: #6b4f35;
   box-sizing: border-box;
-  box-shadow: 0 4px 14px rgba(107, 79, 53, 0.08);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 2px 8px rgba(107, 79, 53, 0.05);
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease;
 }
 
 .wk:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(107, 79, 53, 0.13);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(107, 79, 53, 0.18), 0 3px 8px rgba(107, 79, 53, 0.1) !important;
 }
 
 .ic {
@@ -415,6 +430,13 @@ body {
   padding: 18px;
   box-sizing: border-box;
   color: #6b4f35;
+  box-shadow: 0 2px 8px rgba(107, 79, 53, 0.05);
+  transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.22s ease;
+}
+
+.card-v2:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(107, 79, 53, 0.18), 0 4px 12px rgba(107, 79, 53, 0.1) !important;
 }
 
 .row-v2 {
@@ -428,6 +450,13 @@ body {
   margin-bottom: 8px;
   font-size: 14px;
   color: #6b4f35;
+  box-shadow: 0 1px 4px rgba(107, 79, 53, 0.03);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.row-v2:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 18px rgba(107, 79, 53, 0.15) !important;
 }
 
 .tag-v2 {

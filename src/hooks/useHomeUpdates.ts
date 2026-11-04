@@ -117,6 +117,34 @@ export function useHomeUpdates() {
     notifyChange();
   }, []);
 
+  const deleteVersion = useCallback((id: string): HomeVersionUpdate | null => {
+    let deletedItem: HomeVersionUpdate | null = null;
+    setVersions((prev) => {
+      deletedItem = prev.find((v) => v.id === id) || null;
+      const next = prev.filter((v) => v.id !== id);
+      const remaining = next.length > 0 ? next : DEFAULT_VERSIONS;
+      try {
+        localStorage.setItem(STORAGE_KEY_VERSIONS, JSON.stringify(remaining));
+      } catch {}
+
+      setActiveVersionIdState((currActive) => {
+        let nextActive = currActive;
+        if (currActive === id) {
+          nextActive = remaining[0]?.id || '';
+          try {
+            localStorage.setItem(STORAGE_KEY_ACTIVE, nextActive);
+          } catch {}
+        }
+        return nextActive;
+      });
+
+      return remaining;
+    });
+
+    notifyChange();
+    return deletedItem;
+  }, []);
+
   const activeUpdate: HomeVersionUpdate =
     versions.find((v) => v.id === activeVersionId) ||
     versions[0] || {
@@ -131,6 +159,7 @@ export function useHomeUpdates() {
     activeVersionId,
     activeUpdate,
     addVersion,
+    deleteVersion,
     setActiveVersionId,
   };
 }

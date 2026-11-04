@@ -2,7 +2,7 @@ import { HeartopiaEvent } from '../types/event';
 import { EventsRepository, ListEventsFilter } from './eventsRepository';
 import { getInitialSampleEvents } from './sampleEvents';
 
-export const EVENTS_STORAGE_KEY = 'hh.events.v1';
+export const EVENTS_STORAGE_KEY = 'hh.events.v2';
 
 export class LocalEventsRepository implements EventsRepository {
   private storageKey: string;
@@ -16,39 +16,13 @@ export class LocalEventsRepository implements EventsRepository {
     if (typeof window === 'undefined') return;
 
     try {
+      localStorage.removeItem('hh.events.v1');
       const existing = localStorage.getItem(this.storageKey);
       if (existing === null) {
-        // Storage is empty -> seed it once with sample events
-        const samples = getInitialSampleEvents();
-        localStorage.setItem(this.storageKey, JSON.stringify(samples));
-      } else {
-        // If storage exists, ensure missing initial live events and image_urls are updated
-        const currentList = JSON.parse(existing) as HeartopiaEvent[];
-        const currentIds = new Set(currentList.map((e) => e.id));
-        const samples = getInitialSampleEvents();
-        const sampleMap = new Map(samples.map((s) => [s.id, s]));
-
-        let updated = false;
-        const toAdd = samples.filter((s) => !currentIds.has(s.id));
-        if (toAdd.length > 0) {
-          currentList.push(...toAdd);
-          updated = true;
-        }
-
-        // Backfill image_url on existing sample events if missing
-        currentList.forEach((ev) => {
-          if (!ev.image_url && sampleMap.has(ev.id)) {
-            ev.image_url = sampleMap.get(ev.id)?.image_url;
-            updated = true;
-          }
-        });
-
-        if (updated) {
-          localStorage.setItem(this.storageKey, JSON.stringify(currentList));
-        }
+        localStorage.setItem(this.storageKey, JSON.stringify([]));
       }
     } catch (err) {
-      console.warn('LocalEventsRepository failed to seed storage:', err);
+      console.warn('LocalEventsRepository failed to init storage:', err);
     }
   }
 
@@ -58,10 +32,7 @@ export class LocalEventsRepository implements EventsRepository {
     try {
       const raw = localStorage.getItem(this.storageKey);
       if (!raw) {
-        // Re-seed if somehow removed
-        const samples = getInitialSampleEvents();
-        localStorage.setItem(this.storageKey, JSON.stringify(samples));
-        return samples;
+        return [];
       }
       return JSON.parse(raw) as HeartopiaEvent[];
     } catch (err) {
