@@ -110,6 +110,7 @@ body {
   border-radius: 26px !important;
   padding: 10px 18px !important;
   box-sizing: border-box !important;
+  box-shadow: 0 4px 16px rgba(107, 79, 53, 0.12) !important;
 }
 
 .logo {
@@ -161,6 +162,12 @@ body {
   padding: 18px;
   box-sizing: border-box;
   color: #6b4f35;
+  box-shadow: 0 4px 16px rgba(107, 79, 53, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 20px rgba(107, 79, 53, 0.12);
 }
 
 .card h2 {
@@ -289,6 +296,13 @@ body {
   padding: 14px;
   color: #6b4f35;
   box-sizing: border-box;
+  box-shadow: 0 4px 14px rgba(107, 79, 53, 0.08);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.wk:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(107, 79, 53, 0.13);
 }
 
 .ic {

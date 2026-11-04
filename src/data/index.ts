@@ -11,6 +11,9 @@ export * from './sampleEvents';
 const localRepo = new LocalEventsRepository();
 const supabaseRepo = new SupabaseEventsRepository(localRepo);
 
+export const localEventsRepository = localRepo;
+export const supabaseEventsRepository = supabaseRepo;
+
 export const eventsRepository: EventsRepository = isSupabaseConfigured()
   ? supabaseRepo
   : localRepo;

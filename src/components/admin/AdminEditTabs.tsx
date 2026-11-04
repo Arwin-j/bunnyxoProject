@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 
 export interface AdminEditTabsProps {
-  currentTab?: 'events' | 'codes' | 'maps';
+  currentTab?: 'events' | 'codes' | 'maps' | 'home';
 }
 
 export const AdminEditTabs: React.FC<AdminEditTabsProps> = () => {
@@ -53,6 +53,21 @@ export const AdminEditTabs: React.FC<AdminEditTabsProps> = () => {
         >
           <span className="text-sm select-none" aria-hidden="true">🗺️</span>
           <span>Maps</span>
+        </NavLink>
+
+        {/* Home Tab */}
+        <NavLink
+          to="/admin/edit/home"
+          className={({ isActive }) =>
+            `flex items-center gap-2 rounded-full px-4 sm:px-5 py-1.5 text-xs sm:text-sm font-heading font-semibold transition-all duration-150 select-none cursor-pointer active:translate-y-0.5 ${
+              isActive
+                ? 'bg-[#b23a6b] text-white shadow-xs'
+                : 'bg-[#f3ecda] text-[#6b4f35] hover:bg-white'
+            }`
+          }
+        >
+          <span className="text-sm select-none" aria-hidden="true">🏠</span>
+          <span>Home</span>
         </NavLink>
       </div>
 

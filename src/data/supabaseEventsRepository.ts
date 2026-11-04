@@ -3,6 +3,19 @@ import { EventsRepository, ListEventsFilter } from './eventsRepository';
 import { supabase } from '../lib/supabase';
 import { LocalEventsRepository } from './localEventsRepository';
 
+/**
+ * Races a promise against a timeout in milliseconds.
+ * Prevents requests from hanging indefinitely when remote services are unresponsive.
+ */
+function withTimeout<T>(promise: PromiseLike<T>, ms = 2500): Promise<T> {
+  return Promise.race([
+    Promise.resolve(promise),
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`Supabase request timed out after ${ms}ms`)), ms)
+    ),
+  ]);
+}
+
 export class SupabaseEventsRepository implements EventsRepository {
   private fallbackRepo: LocalEventsRepository;
 
@@ -21,7 +34,7 @@ export class SupabaseEventsRepository implements EventsRepository {
         query = query.eq('visibility', 'published');
       }
 
-      const { data, error } = await query;
+      const { data, error } = await withTimeout(query, 2500);
       if (error) {
         console.warn('SupabaseEventsRepository.list error, falling back to local storage:', error.message);
         return this.fallbackRepo.list(filter);
@@ -56,11 +69,14 @@ export class SupabaseEventsRepository implements EventsRepository {
 
   async get(id: string): Promise<HeartopiaEvent | null> {
     try {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const { data, error } = await withTimeout(
+        supabase
+          .from('events')
+          .select('*')
+          .eq('id', id)
+          .single(),
+        2500
+      );
 
       if (error || !data) {
         return this.fallbackRepo.get(id);
@@ -83,7 +99,10 @@ export class SupabaseEventsRepository implements EventsRepository {
     };
 
     try {
-      const { error } = await supabase.from('events').insert([record]);
+      const { error } = await withTimeout(
+        supabase.from('events').insert([record]),
+        2500
+      );
       if (error) {
         console.warn('Supabase create error, saving locally:', error.message);
       }
@@ -101,12 +120,15 @@ export class SupabaseEventsRepository implements EventsRepository {
     const payload = { ...patch, updated_at };
 
     try {
-      const { data, error } = await supabase
-        .from('events')
-        .update(payload)
-        .eq('id', id)
-        .select()
-        .single();
+      const { data, error } = await withTimeout(
+        supabase
+          .from('events')
+          .update(payload)
+          .eq('id', id)
+          .select()
+          .single(),
+        2500
+      );
 
       if (error || !data) {
         console.warn('Supabase update error, applying locally:', error?.message);
@@ -122,7 +144,10 @@ export class SupabaseEventsRepository implements EventsRepository {
 
   async delete(id: string): Promise<void> {
     try {
-      const { error } = await supabase.from('events').delete().eq('id', id);
+      const { error } = await withTimeout(
+        supabase.from('events').delete().eq('id', id),
+        2500
+      );
       if (error) {
         console.warn('Supabase delete error:', error.message);
       }

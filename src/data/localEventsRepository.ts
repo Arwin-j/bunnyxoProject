@@ -83,12 +83,16 @@ export class LocalEventsRepository implements EventsRepository {
     }
   }
 
-  async list(filter?: ListEventsFilter): Promise<HeartopiaEvent[]> {
+  listSync(filter?: ListEventsFilter): HeartopiaEvent[] {
     const all = this.readAll();
     if (filter?.publishedOnly) {
       return all.filter((ev) => ev.visibility === 'published');
     }
     return all;
+  }
+
+  async list(filter?: ListEventsFilter): Promise<HeartopiaEvent[]> {
+    return this.listSync(filter);
   }
 
   async get(id: string): Promise<HeartopiaEvent | null> {

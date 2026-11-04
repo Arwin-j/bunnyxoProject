@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useRedemptionCodes } from '../hooks/useRedemptionCodes';
 import { useGame } from '../hooks/useGame';
 import { useDiscordPresence } from '../hooks/useDiscordPresence';
+import { useHomeUpdates } from '../hooks/useHomeUpdates';
 
 const DISCORD_LINK = 'https://discord.gg/9CNHMrX6A';
 const INSTAGRAM_LINK =
@@ -12,6 +13,7 @@ export const HomePage: React.FC = () => {
   const { activeCodes } = useRedemptionCodes();
   const { selectedGame } = useGame();
   const { onlineCount: discordOnline } = useDiscordPresence();
+  const { activeUpdate } = useHomeUpdates();
 
   // Copied state for individual code rows
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
@@ -118,6 +120,7 @@ export const HomePage: React.FC = () => {
             color: '#6b4f35',
             boxSizing: 'border-box',
             border: '2px dashed #6e7a3c',
+            boxShadow: '0 6px 22px rgba(107, 79, 53, 0.08)',
           }}
         >
           <div style={{ fontSize: '56px', marginBottom: '16px', lineHeight: 1 }}>🪐🌱✨</div>
@@ -172,6 +175,7 @@ export const HomePage: React.FC = () => {
             color: '#6b4f35',
             boxSizing: 'border-box',
             border: '2px dashed #b23a6b',
+            boxShadow: '0 6px 22px rgba(107, 79, 53, 0.08)',
           }}
         >
           <div style={{ fontSize: '56px', marginBottom: '16px', lineHeight: 1 }}>☁️🌸🐰</div>
@@ -265,10 +269,12 @@ export const HomePage: React.FC = () => {
                 🌸
               </div>
               <div>
-                <strong style={{ fontSize: '14px', color: '#7a5638' }}>Game update</strong>
+                <strong style={{ fontSize: '14px', color: '#7a5638' }}>
+                  Game update · v.{activeUpdate.version}
+                </strong>
                 <br />
                 <span className="sub" style={{ fontSize: '13px', color: '#8c6f55' }}>
-                  Phantom Glow Patch · Heartopia
+                  {activeUpdate.name}
                 </span>
               </div>
             </Link>

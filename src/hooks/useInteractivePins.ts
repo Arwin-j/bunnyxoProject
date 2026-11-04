@@ -44,10 +44,16 @@ export function useInteractivePins(
 
     const loadSupabasePins = async () => {
       try {
-        const { data, error } = await supabase
+        const fetchPromise = supabase
           .from('map_pins')
           .select('*')
           .order('created_at', { ascending: false });
+
+        const timeoutPromise = new Promise<{ data: null; error: Error }>((_, reject) =>
+          setTimeout(() => reject(new Error('Supabase map_pins timeout')), 2500)
+        );
+
+        const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
 
         if (!mounted) return;
         setLoading(false);

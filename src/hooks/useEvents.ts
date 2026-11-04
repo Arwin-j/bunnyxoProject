@@ -1,15 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
 import { HeartopiaEvent } from '../types/event';
-import { eventsRepository, ListEventsFilter } from '../data';
+import { eventsRepository, localEventsRepository, ListEventsFilter } from '../data';
 
 export function useEvents(filter?: ListEventsFilter) {
-  const [events, setEvents] = useState<HeartopiaEvent[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  // Pre-seed synchronously from local repository cache so UI renders immediately
+  const [events, setEvents] = useState<HeartopiaEvent[]>(() => {
+    try {
+      return localEventsRepository.listSync(filter);
+    } catch {
+      return [];
+    }
+  });
+  const [loading, setLoading] = useState<boolean>(() => events.length === 0);
   const [error, setError] = useState<string | null>(null);
 
   const fetchEvents = useCallback(async () => {
     try {
-      setLoading(true);
+      if (events.length === 0) setLoading(true);
       setError(null);
       const list = await eventsRepository.list(filter);
       setEvents(list);
@@ -18,7 +25,7 @@ export function useEvents(filter?: ListEventsFilter) {
     } finally {
       setLoading(false);
     }
-  }, [filter?.publishedOnly]);
+  }, [filter?.publishedOnly, events.length]);
 
   useEffect(() => {
     fetchEvents();

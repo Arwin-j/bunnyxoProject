@@ -131,11 +131,14 @@ export const useRedemptionCodes = () => {
     if (!isSupabaseConfigured()) return;
 
     let mounted = true;
-    supabase
-      .from('redemption_codes')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .then(({ data, error }) => {
+
+    const fetchCodes = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('redemption_codes')
+          .select('*')
+          .order('created_at', { ascending: false });
+
         if (!mounted || error || !data || data.length === 0) return;
         const mapped: RedemptionCode[] = data.map((item) => ({
           id: item.id,
@@ -147,7 +150,12 @@ export const useRedemptionCodes = () => {
           createdAt: item.created_at || new Date().toISOString(),
         }));
         setCodes(mapped);
-      });
+      } catch (err) {
+        console.warn('Supabase redemption_codes fetch error:', err);
+      }
+    };
+
+    fetchCodes();
 
     return () => {
       mounted = false;
@@ -188,22 +196,24 @@ export const useRedemptionCodes = () => {
       setCodes((prev) => [newCode, ...prev]);
 
       if (isSupabaseConfigured()) {
-        supabase
-          .from('redemption_codes')
-          .insert([
-            {
-              id: newCode.id,
-              code: newCode.code,
-              title: newCode.title,
-              rewards: newCode.rewards,
-              expiry: newCode.expiry,
-              is_history: Boolean(newCode.isHistory),
-              created_at: newCode.createdAt,
-            },
-          ])
-          .then(({ error }) => {
+        (async () => {
+          try {
+            const { error } = await supabase.from('redemption_codes').insert([
+              {
+                id: newCode.id,
+                code: newCode.code,
+                title: newCode.title,
+                rewards: newCode.rewards,
+                expiry: newCode.expiry,
+                is_history: Boolean(newCode.isHistory),
+                created_at: newCode.createdAt,
+              },
+            ]);
             if (error) console.warn('Supabase addCode error:', error.message);
-          });
+          } catch (err) {
+            console.warn('Supabase addCode exception:', err);
+          }
+        })();
       }
 
       return newCode;
@@ -240,13 +250,17 @@ export const useRedemptionCodes = () => {
         if (patch.expiry !== undefined) payload.expiry = patch.expiry;
         if (patch.isHistory !== undefined) payload.is_history = patch.isHistory;
 
-        supabase
-          .from('redemption_codes')
-          .update(payload)
-          .eq('id', id)
-          .then(({ error }) => {
+        (async () => {
+          try {
+            const { error } = await supabase
+              .from('redemption_codes')
+              .update(payload)
+              .eq('id', id);
             if (error) console.warn('Supabase updateCode error:', error.message);
-          });
+          } catch (err) {
+            console.warn('Supabase updateCode exception:', err);
+          }
+        })();
       }
     },
     []
@@ -256,13 +270,17 @@ export const useRedemptionCodes = () => {
     setCodes((prev) => prev.filter((c) => c.id !== id));
 
     if (isSupabaseConfigured()) {
-      supabase
-        .from('redemption_codes')
-        .delete()
-        .eq('id', id)
-        .then(({ error }) => {
+      (async () => {
+        try {
+          const { error } = await supabase
+            .from('redemption_codes')
+            .delete()
+            .eq('id', id);
           if (error) console.warn('Supabase deleteCode error:', error.message);
-        });
+        } catch (err) {
+          console.warn('Supabase deleteCode exception:', err);
+        }
+      })();
     }
   }, []);
 
@@ -270,13 +288,17 @@ export const useRedemptionCodes = () => {
     setCodes((prev) => {
       const target = prev.find((c) => c.id === id);
       if (target && isSupabaseConfigured()) {
-        supabase
-          .from('redemption_codes')
-          .update({ is_history: !target.isHistory })
-          .eq('id', id)
-          .then(({ error }) => {
+        (async () => {
+          try {
+            const { error } = await supabase
+              .from('redemption_codes')
+              .update({ is_history: !target.isHistory })
+              .eq('id', id);
             if (error) console.warn('Supabase toggleHistory error:', error.message);
-          });
+          } catch (err) {
+            console.warn('Supabase toggleHistory exception:', err);
+          }
+        })();
       }
       return prev.map((c) => (c.id === id ? { ...c, isHistory: !c.isHistory } : c));
     });

@@ -186,6 +186,7 @@ export const Header: React.FC = () => {
             padding: '18px',
             boxSizing: 'border-box',
             position: 'relative',
+            boxShadow: '0 6px 22px rgba(178, 58, 107, 0.12)',
           }}
         >
           {/* Game Selector Dropdown Menu */}
@@ -397,6 +398,7 @@ export const Header: React.FC = () => {
             borderRadius: '24px',
             padding: '18px',
             boxSizing: 'border-box',
+            boxShadow: '0 6px 22px rgba(110, 122, 60, 0.22)',
           }}
         >
           <h2
